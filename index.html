@@ -173,18 +173,21 @@
 </head>
 <body class="h-screen flex text-sm transition-colors">
 
+    <!-- TOOLTIP GLOBAL -->
+    <div id="global-tooltip" class="fixed z-[9999] bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shadow-xl opacity-0 pointer-events-none transition-opacity duration-200" style="left: 0; top: 0;"></div>
+
     <!-- LEFT SIDEBAR -->
     <aside class="w-[60px] md:w-[80px] h-full flex flex-col items-center py-4 md:py-6 border-r border-white/5 bg-panel/90 z-40 shrink-0 transition-all">
         
         <!-- Top Core Icons -->
         <div class="flex flex-col gap-3 md:gap-4 w-full items-center mb-4">
             <!-- Home Icon -->
-            <button id="left-home" onclick="goHome()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-2xl text-white bg-white/10 hover:bg-white/20 transition border border-transparent">
+            <button id="left-home" onclick="goHome()" onmouseenter="showTooltip(this, 'Home Dashboard')" onmouseleave="hideTooltip()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-2xl text-white bg-white/10 hover:bg-white/20 transition border border-transparent">
                 <i class="fa-solid fa-house-chimney text-lg md:text-xl"></i>
             </button>
             
             <!-- Apps Icon (Toggle Right Panel) -->
-            <button id="left-apps" onclick="toggleRightPanel()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-[18px] bg-accent text-dark shadow-[0_0_20px_rgba(74,222,128,0.4)] transition">
+            <button id="left-apps" onclick="toggleRightPanel()" onmouseenter="showTooltip(this, 'Toggle Menu')" onmouseleave="hideTooltip()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-[18px] bg-accent text-dark shadow-[0_0_20px_rgba(74,222,128,0.4)] transition">
                 <i class="fa-solid fa-border-all text-lg md:text-xl"></i>
             </button>
         </div>
@@ -192,78 +195,68 @@
         <!-- Line Separator -->
         <div class="w-6 md:w-8 h-[1px] bg-white/10 my-1 md:my-2"></div>
 
-        <!-- 10 Menu Icons (With Tooltips for Desktop) -->
+        <!-- 10 Menu Icons (With Global Tooltips) -->
         <div class="flex-1 w-full flex flex-col items-center gap-2 md:gap-3 overflow-y-auto custom-scrollbar-left pb-4 pt-2 relative">
             
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-1" onclick="openMenu(1)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-1" onclick="openMenu(1)" onmouseenter="showTooltip(this, 'LOOKUP DATA OTOMATIS')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-folder-open text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">LOOKUP DATA OTOMATIS</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-2" onclick="openMenu(2)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-2" onclick="openMenu(2)" onmouseenter="showTooltip(this, 'ID ORIN GRAMEDIA X KODE BSOFT')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-address-book text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">ID ORIN GRAMEDIA X KODE BSOFT</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-3" onclick="openMenu(3)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-3" onclick="openMenu(3)" onmouseenter="showTooltip(this, 'Report Stock Status Gramedia (GAM)')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-box text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">Report Stock Status Gramedia (GAM)</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-4" onclick="openMenu(4)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-4" onclick="openMenu(4)" onmouseenter="showTooltip(this, 'Rekap STO Gramedia')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-layer-group text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">Rekap STO Gramedia</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-5" onclick="openMenu(5)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-5" onclick="openMenu(5)" onmouseenter="showTooltip(this, 'Rekap RO Gramedia 2026')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-chart-column text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">Rekap RO Gramedia 2026</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-6" onclick="openMenu(6)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-6" onclick="openMenu(6)" onmouseenter="showTooltip(this, 'E-Catalog Penawaran Gramedia')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-book-open text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">E-Catalog Penawaran Gramedia</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-7" onclick="openMenu(7)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-7" onclick="openMenu(7)" onmouseenter="showTooltip(this, 'DATA TOKO GRAMEDIA')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-building text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">DATA TOKO GRAMEDIA</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-8" onclick="openMenu(8)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-8" onclick="openMenu(8)" onmouseenter="showTooltip(this, 'Laku Jual Gramedia 2026 (GAM)')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-sack-dollar text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">Laku Jual Gramedia 2026 (GAM)</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
-                <button id="left-btn-9" onclick="openMenu(9)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+            <div class="w-full flex justify-center">
+                <button id="left-btn-9" onclick="openMenu(9)" onmouseenter="showTooltip(this, 'Consigment Advice Per Store 2026 (GAM)')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-money-bill-wave text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">Consigment Advice Per Store 2026 (GAM)</span>
             </div>
 
-            <div class="relative group flex items-center justify-center w-full">
+            <div class="w-full flex justify-center">
                 <!-- UPDATE IKON KE TWIDY TOOLS -->
-                <button id="left-btn-10" onclick="openMenu(10)" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
+                <button id="left-btn-10" onclick="openMenu(10)" onmouseenter="showTooltip(this, 'TWIDY TOOLS')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-screwdriver-wrench text-base md:text-lg"></i>
                 </button>
-                <span class="hidden md:block absolute left-16 bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl">TWIDY TOOLS</span>
             </div>
         </div>
 
@@ -271,8 +264,8 @@
         <div class="w-6 md:w-8 h-[1px] bg-white/10 mt-1 mb-2"></div>
 
         <!-- Bottom Icon (THEME TOGGLE) -->
-        <div class="pb-2">
-            <button onclick="toggleTheme()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-2xl text-gray-400 hover:text-accent transition">
+        <div class="pb-2 w-full flex justify-center">
+            <button onclick="toggleTheme()" onmouseenter="showTooltip(this, 'Ubah Tema')" onmouseleave="hideTooltip()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-2xl text-gray-400 hover:text-accent transition">
                 <i id="theme-icon" class="fa-regular fa-sun text-xl md:text-2xl"></i>
             </button>
         </div>
@@ -366,23 +359,28 @@
                             </div>
                         </div>
                         <div class="flex gap-2 shrink-0">
+                            <!-- TOMBOL REFRESH -->
+                            <button onclick="refreshIframe('lookup-iframe', this)" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate transition-transform duration-500"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                            <!-- Tombol Lainnya -->
                             <button onclick="toggleRightPanel()" class="flex px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition items-center justify-center gap-2">
                                 <i class="fa-solid fa-list-ul"></i> <span class="hidden sm:inline">Menu</span>
                             </button>
-                            <a href="https://lookupdata-gramedia.vercel.app/" target="_blank" class="px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Buka Tab</span>
+                            <a href="https://lookupdata-gramedia.vercel.app/" target="_blank" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Tab Baru</span>
                             </a>
                         </div>
                     </div>
                     <div class="flex-1 w-full relative">
-                        <iframe src="https://lookupdata-gramedia.vercel.app/" class="absolute inset-0 w-full h-full border-none"></iframe>
+                        <iframe id="lookup-iframe" src="https://lookupdata-gramedia.vercel.app/" class="absolute inset-0 w-full h-full border-none"></iframe>
                     </div>
                 </div>
 
                 <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC (MENU 2 - 9) -->
                 <div id="view-excel" class="view-layer flex flex-col bg-white">
-                    <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2">
-                        <div class="flex items-center gap-3 min-w-0">
+                    <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
+                        <div class="flex items-center gap-3 min-w-0 pr-4">
                             <div id="excel-icon-box" class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 shrink-0">
                                 <i id="excel-icon" class="fa-solid fa-box text-base md:text-lg"></i>
                             </div>
@@ -392,13 +390,17 @@
                             </div>
                         </div>
                         <div class="flex gap-2 shrink-0">
+                            <!-- TOMBOL REFRESH -->
+                            <button onclick="refreshIframe('excel-iframe', this)" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate transition-transform duration-500"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
                             <button onclick="toggleRightPanel()" class="flex px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition items-center justify-center gap-2">
                                 <i class="fa-solid fa-list-ul"></i> <span class="hidden sm:inline">Menu</span>
                             </button>
-                            <a id="excel-btn-fullscreen" href="#" target="_blank" class="px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
+                            <a id="excel-btn-fullscreen" href="#" target="_blank" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Full</span>
                             </a>
-                            <a id="excel-btn-download" href="#" class="px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-accent hover:bg-accent/80 text-dark font-bold text-sm transition flex items-center gap-2 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
+                            <a id="excel-btn-download" href="#" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-accent hover:bg-accent/80 text-dark font-bold text-sm transition flex items-center gap-2 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
                                 <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Unduh</span>
                             </a>
                         </div>
@@ -422,18 +424,22 @@
                             </div>
                         </div>
                         <div class="flex gap-2 shrink-0">
+                            <!-- TOMBOL REFRESH -->
+                            <button onclick="refreshIframe('twidy-iframe', this)" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate transition-transform duration-500"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
                             <!-- Tombol Menu -->
                             <button onclick="toggleRightPanel()" class="flex px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition items-center justify-center gap-2">
                                 <i class="fa-solid fa-list-ul"></i> <span class="hidden sm:inline">Menu</span>
                             </button>
-                            <a href="https://twidytools.my.id/" target="_blank" class="px-3 py-2 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Buka Tab</span>
+                            <a href="https://twidytools.my.id/" target="_blank" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Tab Baru</span>
                             </a>
                         </div>
                     </div>
                     <div class="flex-1 w-full relative">
                         <!-- Menampilkan IFRAME Twidy Tools -->
-                        <iframe src="https://twidytools.my.id/" class="absolute inset-0 w-full h-full border-none"></iframe>
+                        <iframe id="twidy-iframe" src="https://twidytools.my.id/" class="absolute inset-0 w-full h-full border-none"></iframe>
                     </div>
                 </div>
 
@@ -560,6 +566,44 @@
             },
             10: { type: 'twidy' } // Update Tipe Menu 10
         };
+
+        // --- GLOBAL TOOLTIP SCRIPT (Menampilkan tooltip di luar batas area potong/scroll) ---
+        const tooltip = document.getElementById('global-tooltip');
+        function showTooltip(element, text) {
+            // Sembunyikan jika dilayar kecil (mobile)
+            if (window.innerWidth < 768) return;
+            
+            tooltip.innerText = text;
+            const rect = element.getBoundingClientRect();
+            
+            // Kalkulasi posisi (Kanan tombol)
+            tooltip.style.left = (rect.right + 12) + 'px';
+            tooltip.style.top = (rect.top + (rect.height / 2) - (tooltip.offsetHeight / 2)) + 'px';
+            tooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            tooltip.style.opacity = '0';
+        }
+
+        // --- FUNGSI REFRESH IFRAME ---
+        function refreshIframe(iframeId, btnElement) {
+            const iframe = document.getElementById(iframeId);
+            if (iframe) {
+                // Memuat ulang link yang saat ini aktif
+                const currentSrc = iframe.src;
+                iframe.src = currentSrc;
+                
+                // Tambahkan efek animasi berputar (spin) ke ikon refresh selama 1 detik
+                const icon = btnElement.querySelector('i');
+                if (icon) {
+                    icon.classList.add('rotate-180');
+                    setTimeout(() => {
+                        icon.classList.remove('rotate-180');
+                    }, 500);
+                }
+            }
+        }
 
         // Initialize Panel state on load (Tampil jika layar PC)
         if(window.innerWidth < 1024) {
