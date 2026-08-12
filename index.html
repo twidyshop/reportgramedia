@@ -638,7 +638,7 @@
         }
 
         // ==========================================
-        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE SMART FILTER & SORTING (DATE/NUMERIC AWARE)
+        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE COLLAPSIBLE HIERARCHY DATE FILTER
         // ==========================================
         let roDataAll = []; 
         let roFilteredData = [];
@@ -647,11 +647,31 @@
         
         let currentPage = 1;
         const rowsPerPage = 100;
-        let searchTimeout = null;
         
         let columnCheckFilters = {}; 
         let currentSort = { colIndex: null, direction: null }; 
         let activeDropdownIndex = null; 
+
+        const desiredColumnOrder = [
+            "Consignment replenishment order",
+            "Warehouse",
+            "Name2",
+            "Created date and time",
+            "Status",
+            "Expired date",
+            "Item number",
+            "Product name",
+            "Quantity",
+            "Sug. Retail price",
+            "Disc %",
+            "Price (Exclude)",
+            "Amount (Exclude)",
+            "Receipt amount",
+            "Confirmed quantity",
+            "Deliver remainder",
+            "Received",
+            "Receipt date"
+        ];
 
         async function fetchROData(btnElement = null) {
             const statusEl = document.getElementById('ro-status');
@@ -689,17 +709,41 @@
                 if (data.status === 'error') throw new Error(data.errors[0].message || 'Gagal mengakses data.');
 
                 const table = data.table;
-                roColumns = table.cols.map((c, i) => (c && c.label) ? c.label : 'Kolom ' + (i+1));
+                const rawColumns = table.cols.map((c, i) => (c && c.label) ? c.label.trim() : 'Kolom ' + (i+1));
                 
-                roDataAll = table.rows.map(row => {
+                roColumns = [];
+                desiredColumnOrder.forEach(targetCol => {
+                    const found = rawColumns.find(rc => rc.toLowerCase() === targetCol.toLowerCase());
+                    if (found && !roColumns.includes(found)) {
+                        roColumns.push(found);
+                    }
+                });
+
+                desiredColumnOrder.forEach(targetCol => {
+                    const found = rawColumns.find(rc => rc.toLowerCase().includes(targetCol.toLowerCase()));
+                    if (found && !roColumns.includes(found)) {
+                        roColumns.push(found);
+                    }
+                });
+
+                const rawRowsData = table.rows.map(row => {
                     let rowData = {};
                     row.c.forEach((cell, i) => {
-                        if(roColumns[i]) {
+                        const colLabel = rawColumns[i];
+                        if(colLabel) {
                             const val = cell ? (cell.f !== undefined ? cell.f : (cell.v !== null ? cell.v : '')) : '';
-                            rowData[roColumns[i]] = val;
+                            rowData[colLabel] = val;
                         }
                     });
                     return rowData;
+                });
+
+                roDataAll = rawRowsData.map(row => {
+                    let newRow = {};
+                    roColumns.forEach(col => {
+                        newRow[col] = row[col] !== undefined ? row[col] : '';
+                    });
+                    return newRow;
                 });
 
                 roFilteredData = [...roDataAll];
@@ -757,6 +801,35 @@
             thead.innerHTML = headerHTML;
         }
 
+        function isDateColumn(colName) {
+            const lower = colName.toLowerCase();
+            return lower.includes('date') || lower.includes('time');
+        }
+
+        function parseDateObj(valStr) {
+            if (!valStr) return null;
+            const parts = valStr.toString().split(' ');
+            const datePart = parts[0];
+            const dateSegments = datePart.split('/');
+            
+            if (dateSegments.length === 3) {
+                let m = parseInt(dateSegments[0], 10);
+                let d = parseInt(dateSegments[1], 10);
+                let y = parseInt(dateSegments[2], 10);
+                if (y < 100) y += 2000;
+                
+                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                return {
+                    year: y.toString(),
+                    monthNum: m,
+                    monthName: monthNames[m - 1] || ("Bulan " + m),
+                    day: d,
+                    raw: valStr.toString()
+                };
+            }
+            return null;
+        }
+
         function toggleExcelDropdown(event, colIndex) {
             event.stopPropagation();
             const existingPopup = document.getElementById('excel-filter-popup');
@@ -771,29 +844,83 @@
 
             const th = event.currentTarget.closest('th');
             const rect = th.getBoundingClientRect();
+            const colName = roColumns[colIndex];
+            const isDateCol = isDateColumn(colName);
 
             const popup = document.createElement('div');
             popup.id = 'excel-filter-popup';
-            popup.className = 'excel-dropdown-menu fixed z-50 w-64 rounded-xl p-3 shadow-2xl text-xs flex flex-col gap-2.5';
+            popup.className = 'excel-dropdown-menu fixed z-50 w-72 rounded-xl p-3 shadow-2xl text-xs flex flex-col gap-2.5';
             
             popup.style.top = (rect.bottom + 4) + 'px';
-            popup.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+            popup.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
 
-            const colName = roColumns[colIndex];
-            let uniqueValues = [...new Set(roDataAll.map(row => row[colName]))].sort();
-
-            let checkboxesHTML = '';
             const currentAllowed = columnCheckFilters[colIndex]; 
 
-            uniqueValues.forEach((val) => {
-                const valStr = val !== null && val !== undefined ? val.toString() : '';
-                const isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
-                checkboxesHTML += `
-                <label class="excel-chk-label flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
-                    <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
-                    <span class="truncate" title="${escapeHTML(valStr)}">${valStr === '' ? '(Kosong)' : escapeHTML(valStr)}</span>
-                </label>`;
-            });
+            let listContentHTML = '';
+
+            if (isDateCol) {
+                let tree = {};
+                roDataAll.forEach(row => {
+                    const val = row[colName];
+                    const dObj = parseDateObj(val);
+                    const valStr = val !== null && val !== undefined ? val.toString() : '';
+                    if (valStr === '') return;
+
+                    if (dObj) {
+                        if (!tree[dObj.year]) tree[dObj.year] = {};
+                        if (!tree[dObj.year][dObj.monthName]) tree[dObj.year][dObj.monthName] = [];
+                        if (!tree[dObj.year][dObj.monthName].includes(valStr)) {
+                            tree[dObj.year][dObj.monthName].push(valStr);
+                        }
+                    }
+                });
+
+                for (let year in tree) {
+                    let yearChecked = currentAllowed === undefined || Object.values(tree[year]).some(months => months.some(v => currentAllowed.has(v)));
+                    listContentHTML += `
+                    <div class="flex flex-col gap-1 my-1">
+                        <div class="flex items-center gap-2 font-bold px-1 text-white">
+                            <input type="checkbox" class="excel-chk-year rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5" onchange="toggleYearGroup(this)" ${yearChecked ? 'checked' : ''}>
+                            <span>${year}</span>
+                        </div>`;
+                    
+                    for (let month in tree[year]) {
+                        let monthChecked = currentAllowed === undefined || tree[year][month].some(v => currentAllowed.has(v));
+                        listContentHTML += `
+                        <div class="flex flex-col gap-0.5 ml-4 my-1">
+                            <div class="flex items-center justify-between px-1 text-gray-300 font-semibold hover:bg-white/5 rounded py-0.5">
+                                <label class="flex items-center gap-2 cursor-pointer truncate">
+                                    <input type="checkbox" class="excel-chk-month rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5" onchange="toggleMonthGroup(this)" ${monthChecked ? 'checked' : ''}>
+                                    <span>${month}</span>
+                                </label>
+                                <button type="button" onclick="toggleSubTree(this)" class="text-gray-400 hover:text-white px-1.5 py-0.5"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                            </div>
+                            <div class="tree-subtree hidden flex-col gap-0.5 ml-5 mt-1 border-l border-white/10 pl-2">`;
+                        
+                        tree[year][month].forEach(valStr => {
+                            let isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
+                            listContentHTML += `
+                            <label class="excel-chk-label flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
+                                <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk-leaf excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                                <span class="truncate text-gray-400" title="${escapeHTML(valStr)}">${escapeHTML(valStr)}</span>
+                            </label>`;
+                        });
+                        listContentHTML += `</div></div>`;
+                    }
+                    listContentHTML += `</div>`;
+                }
+            } else {
+                let uniqueValues = [...new Set(roDataAll.map(row => row[colName]))].sort();
+                uniqueValues.forEach((val) => {
+                    const valStr = val !== null && val !== undefined ? val.toString() : '';
+                    const isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
+                    listContentHTML += `
+                    <label class="excel-chk-label flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
+                        <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                        <span class="truncate" title="${escapeHTML(valStr)}">${valStr === '' ? '(Kosong)' : escapeHTML(valStr)}</span>
+                    </label>`;
+                });
+            }
 
             popup.innerHTML = `
                 <!-- Bagian Sort -->
@@ -805,7 +932,7 @@
                 <!-- Bagian Search dalam Filter -->
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai (misal: 8/11/26)..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
                 </div>
 
                 <!-- Select All / Deselect All -->
@@ -814,9 +941,9 @@
                     <button onclick="toggleSelectAllCheckboxes(false)" class="hover:text-accent underline">Hapus Semua</button>
                 </div>
 
-                <!-- List Checkbox Unique Values -->
-                <div id="excel-checkbox-list" class="excel-chk-container max-h-44 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1 bg-black/20">
-                    ${checkboxesHTML}
+                <!-- List Checkbox Unique Values / Tree -->
+                <div id="excel-checkbox-list" class="excel-chk-container max-h-52 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1.5 bg-black/20">
+                    ${listContentHTML}
                 </div>
 
                 <!-- Tombol Aksi -->
@@ -829,13 +956,41 @@
             document.body.appendChild(popup);
         }
 
+        // Fungsi Collapse / Expand (Minimize / Maximize bulan)
+        function toggleSubTree(btn) {
+            const subtree = btn.closest('div').nextElementSibling;
+            const icon = btn.querySelector('i');
+            if (subtree.classList.contains('hidden')) {
+                subtree.classList.remove('hidden');
+                subtree.classList.add('flex');
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            } else {
+                subtree.classList.add('hidden');
+                subtree.classList.remove('flex');
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            }
+        }
+
+        function toggleYearGroup(chk) {
+            const groupDiv = chk.closest('div').parentElement;
+            const subBoxes = groupDiv.querySelectorAll('input[type="checkbox"]');
+            subBoxes.forEach(b => b.checked = chk.checked);
+        }
+
+        function toggleMonthGroup(chk) {
+            const groupDiv = chk.closest('div').parentElement;
+            const subBoxes = groupDiv.querySelectorAll('.excel-chk-leaf');
+            subBoxes.forEach(b => b.checked = chk.checked);
+        }
+
         function closeAllExcelDropdowns() {
             const popup = document.getElementById('excel-filter-popup');
             if (popup) popup.remove();
             activeDropdownIndex = null;
         }
 
-        // Filter popup checkbox berdasarkan ketikan pencarian di dalam pop-up
         function filterPopupCheckboxes(keyword) {
             const listContainer = document.getElementById('excel-checkbox-list');
             const labels = listContainer.getElementsByClassName('excel-chk-label');
@@ -844,6 +999,14 @@
                 const text = lbl.getAttribute('data-val').toLowerCase();
                 if (text.includes(q)) {
                     lbl.style.display = 'flex';
+                    // Otomatis buka foldernya jika ada yang cocok dengan pencarian
+                    let subtree = lbl.closest('.tree-subtree');
+                    if (subtree) {
+                        subtree.classList.remove('hidden');
+                        subtree.classList.add('flex');
+                        let btnIcon = subtree.previousElementSibling.querySelector('i');
+                        if (btnIcon) { btnIcon.classList.remove('fa-plus'); btnIcon.classList.add('fa-minus'); }
+                    }
                 } else {
                     lbl.style.display = 'none';
                 }
@@ -852,46 +1015,30 @@
 
         function toggleSelectAllCheckboxes(checkState) {
             const listContainer = document.getElementById('excel-checkbox-list');
-            const labels = listContainer.getElementsByClassName('excel-chk-label');
-            for (let lbl of labels) {
-                if (lbl.style.display !== 'none') {
-                    const chk = lbl.querySelector('.excel-chk');
-                    if (chk) chk.checked = checkState;
-                }
-            }
+            const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(chk => chk.checked = checkState);
         }
 
-        // Terapkan Filter Excel: Jika sedang mengetik di pencarian pop-up, centang HANYA yang terlihat/cocok
         function applyExcelFilter(colIndex) {
             const listContainer = document.getElementById('excel-checkbox-list');
-            const labels = listContainer.getElementsByClassName('excel-chk-label');
-            const searchInput = document.getElementById('excel-popup-search');
-            const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
-
+            const checkboxes = listContainer.getElementsByClassName('excel-chk');
+            
             let allowedSet = new Set();
+            let totalChecked = 0;
+            let totalBoxes = 0;
 
-            if (searchQuery !== '') {
-                // Jika user sedang mengetik search di pop-up, otomatis pilih item yang tampak/cocok
-                for (let lbl of labels) {
-                    const val = lbl.getAttribute('data-val');
-                    if (val.toLowerCase().includes(searchQuery)) {
-                        allowedSet.add(val);
-                    }
-                }
-            } else {
-                // Jika tidak mengetik search, ikuti status checkbox manual
-                const checkboxes = listContainer.getElementsByClassName('excel-chk');
-                for (let chk of checkboxes) {
-                    if (chk.checked) {
-                        allowedSet.add(chk.value);
-                    }
+            for (let chk of checkboxes) {
+                totalBoxes++;
+                if (chk.checked) {
+                    allowedSet.add(chk.value);
+                    totalChecked++;
                 }
             }
 
             const colName = roColumns[colIndex];
             const uniqueValuesCount = new Set(roDataAll.map(row => row[colName])).size;
 
-            if (allowedSet.size === uniqueValuesCount || allowedSet.size === 0) {
+            if (totalChecked === totalBoxes || totalChecked === 0) {
                 delete columnCheckFilters[colIndex];
             } else {
                 columnCheckFilters[colIndex] = allowedSet;
@@ -916,11 +1063,9 @@
             renderROHeaders();
         }
 
-        // Helper untuk parsing tanggal (misal format "8/11/26 12:49" atau "1/2/26 12:20") agar akurat disort
         function parseDateOrNumber(valStr) {
             if (!valStr) return 0;
-            // Cek apakah format tanggal m/d/yy atau m/d/yyyy
-            const parts = valStr.split(' ');
+            const parts = valStr.toString().split(' ');
             const datePart = parts[0];
             const timePart = parts[1] || '00:00';
             const dateSegments = datePart.split('/');
@@ -929,7 +1074,7 @@
                 let m = parseInt(dateSegments[0], 10);
                 let d = parseInt(dateSegments[1], 10);
                 let y = parseInt(dateSegments[2], 10);
-                if (y < 100) y += 2000; // Ubah '26 jadi 2026
+                if (y < 100) y += 2000;
 
                 const timeSegments = timePart.split(':');
                 let h = parseInt(timeSegments[0], 10) || 0;
@@ -938,7 +1083,6 @@
                 return new Date(y, m - 1, d, h, min).getTime();
             }
 
-            // Jika angka biasa
             let num = parseFloat(valStr);
             if (!isNaN(num)) return num;
 
