@@ -79,16 +79,38 @@
 
         /* RO TABLE LIGHT MODE CUSTOMIZATIONS */
         body.light-mode #view-ro-table .bg-panel { background-color: rgba(255, 255, 255, 0.95); }
-        body.light-mode #view-ro-table input { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.1); }
-        body.light-mode #view-ro-table thead { background-color: #f8fafc; color: #0f172a; }
+        body.light-mode #view-ro-table input { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.15); }
+        body.light-mode #view-ro-table thead { background-color: #f1f5f9; color: #0f172a; }
+        body.light-mode #view-ro-table thead th { color: #0f172a !important; }
         body.light-mode #view-ro-table tbody { color: #334155; }
         body.light-mode #view-ro-table tr.hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.05) !important; }
-        body.light-mode #view-ro-table th, body.light-mode #view-ro-table td { border-color: rgba(0,0,0,0.05) !important; }
-        body.light-mode #view-ro-table th select { background-color: #ffffff; color: #0f172a; border-color: rgba(0,0,0,0.15); }
+        body.light-mode #view-ro-table th, body.light-mode #view-ro-table td { border-color: rgba(0,0,0,0.08) !important; }
         body.light-mode #ro-status { background-color: #ffffff; color: #64748b; }
         body.light-mode .btn-pagination { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.1); }
         body.light-mode .btn-pagination:hover:not(:disabled) { background-color: #e2e8f0; }
+        body.light-mode #search-suggestions { background-color: #ffffff; border-color: rgba(0,0,0,0.15); color: #0f172a; }
+        body.light-mode .suggestion-item:hover, body.light-mode .suggestion-item.active-suggestion { background-color: #f1f5f9; color: #2563eb; }
         
+        /* Excel Filter Popup Menu Light/Dark */
+        .excel-dropdown-menu {
+            background-color: #1c1c1f;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        body.light-mode .excel-dropdown-menu {
+            background-color: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            color: #0f172a;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+        }
+        body.light-mode .excel-menu-item:hover {
+            background-color: #f1f5f9;
+            color: #2563eb;
+        }
+        body.light-mode .excel-divider {
+            border-color: rgba(0, 0, 0, 0.1);
+        }
         /* ------------------------------------------- */
 
         /* Center Content Animations */
@@ -338,7 +360,7 @@
                     </div>
                 </div>
 
-                <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC (UNTUK MENU IFRAME BIASA) -->
+                <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC -->
                 <div id="view-excel" class="view-layer flex flex-col bg-white">
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
                         <div class="flex items-center gap-3 min-w-0 pr-4">
@@ -391,11 +413,14 @@
                     </div>
                     
                     <div class="flex-1 w-full relative flex flex-col bg-panel min-h-0">
-                        <!-- Search & Status Bar -->
-                        <div class="px-4 py-3 border-b border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
-                            <div class="relative w-full sm:w-80 lg:w-96">
+                        <!-- Search & Status Bar dengan Smart Google-like Suggestions -->
+                        <div class="px-4 py-3 border-b border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0 relative">
+                            <div class="relative w-full sm:w-96 lg:w-[450px]">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                                <input type="text" id="ro-search" oninput="filterROTable()" placeholder="Pencarian Global (Semua Kolom)..." class="w-full bg-[#121214] border border-white/10 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-accent transition text-sm">
+                                <input type="text" id="ro-search" autocomplete="off" oninput="onGlobalSearchInput(event)" onkeydown="onGlobalSearchKeydown(event)" placeholder="Ketik apa saja (misal: garda, 1/10/26)..." class="w-full bg-[#121214] border border-white/10 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-accent transition text-sm">
+                                
+                                <!-- Container Dropdown Suggestions -->
+                                <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-[#1c1c1f] border border-white/20 rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                             </div>
                             <div id="ro-count" class="text-xs md:text-sm text-textDim font-medium font-mono whitespace-nowrap">
                                 Menampilkan 0 dari 0 data
@@ -410,8 +435,7 @@
                             </div>
                             
                             <table class="w-full text-left border-collapse text-sm text-gray-300" id="ro-table">
-                                <!-- Bagian Header Tabel (Akan digenerate via JS beserta filter) -->
-                                <thead class="bg-[#121214] text-white sticky top-0 z-10 shadow-md">
+                                <thead class="bg-[#121214] text-white sticky top-0 z-30 shadow-md">
                                     <tr id="ro-thead"></tr>
                                 </thead>
                                 <tbody id="ro-tbody" class="divide-y divide-white/5">
@@ -602,7 +626,7 @@
         }
 
         // ==========================================
-        // LOGIKA REKAP RO GRAMEDIA (GVIZ API) + FILTER + PAGINATION
+        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE HEADER FILTER & SORT MENU
         // ==========================================
         let roDataAll = []; 
         let roFilteredData = [];
@@ -613,8 +637,10 @@
         const rowsPerPage = 100;
         let searchTimeout = null;
         
-        // Objek untuk menyimpan filter kolom yang sedang aktif
-        let columnFilters = {}; 
+        // Menyimpan state filter & sorting per kolom
+        let columnCheckFilters = {}; // { colIndex: Set of allowed values } atau null jika semua dicentang
+        let currentSort = { colIndex: null, direction: null }; // direction: 'asc' or 'desc'
+        let activeDropdownIndex = null; // Indeks kolom yang sedang terbuka popupnya
 
         async function fetchROData(btnElement = null) {
             const statusEl = document.getElementById('ro-status');
@@ -634,9 +660,9 @@
             tbody.innerHTML = '';
             thead.innerHTML = '';
             document.getElementById('ro-search').value = ''; 
-            
-            // Reset filter kolom setiap kali mengambil ulang data
-            columnFilters = {};
+            columnCheckFilters = {};
+            currentSort = { colIndex: null, direction: null };
+            closeAllExcelDropdowns();
 
             const sheetId = '1Vw6CZKFgtv6Hwci363vGrQE5ZihybodGzqAb5tas3gY';
             const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
@@ -670,7 +696,6 @@
                 isRoLoaded = true;
                 statusEl.style.display = 'none';
                 
-                // Men-generate header beserta dropdown filternya
                 renderROHeaders();
                 renderTablePage();
                 
@@ -689,48 +714,247 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Generate Header berserta Elemen <select> untuk Filter Kolom
+        // Render Header dengan Tombol Dropdown Excel-like
         function renderROHeaders() {
             const thead = document.getElementById('ro-thead');
             let headerHTML = '';
             
             roColumns.forEach((col, i) => {
-                // Mencari nilai unik untuk setiap kolom
-                const uniqueValues = [...new Set(roDataAll.map(row => row[col]))]
-                    .filter(v => v !== null && v !== '')
-                    .sort();
-                
-                let optionsHTML = `<option value="">Semua</option>`;
-                uniqueValues.forEach(val => {
-                    optionsHTML += `<option value="${escapeHTML(val)}">${escapeHTML(val)}</option>`;
-                });
+                const isFiltered = columnCheckFilters[i] !== undefined;
+                const isSorted = currentSort.colIndex === i;
+                let sortIcon = '<i class="fa-solid fa-sort text-gray-400 text-xs ml-1"></i>';
+                if (isSorted) {
+                    sortIcon = currentSort.direction === 'asc' 
+                        ? '<i class="fa-solid fa-sort-up text-accent text-xs ml-1"></i>' 
+                        : '<i class="fa-solid fa-sort-down text-accent text-xs ml-1"></i>';
+                }
+                const filterBadge = isFiltered ? '<span class="w-2 h-2 rounded-full bg-accent inline-block ml-1"></span>' : '';
 
                 headerHTML += `
-                <th class="px-4 py-2 font-semibold border-b border-white/10 whitespace-nowrap align-top bg-[#121214] z-10">
-                    <div class="flex flex-col gap-2">
-                        <span>${escapeHTML(col)}</span>
-                        <select onchange="updateColumnFilter(${i}, this.value)" class="font-normal bg-[#1c1c1f] border border-white/20 text-xs rounded p-1 text-gray-300 w-full min-w-[120px] focus:outline-none focus:border-accent transition">
-                            ${optionsHTML}
-                        </select>
+                <th class="px-4 py-3 font-semibold border-b border-white/10 whitespace-nowrap relative select-none bg-panel">
+                    <div class="flex items-center justify-between gap-2 cursor-pointer group" onclick="toggleExcelDropdown(event, ${i})">
+                        <div class="flex items-center gap-1 truncate">
+                            <span class="text-white font-medium">${escapeHTML(col)}</span>
+                            ${filterBadge}
+                        </div>
+                        <div class="flex items-center text-gray-400 group-hover:text-white">
+                            ${sortIcon}
+                            <i class="fa-solid fa-caret-down text-xs ml-1"></i>
+                        </div>
                     </div>
                 </th>`;
             });
             thead.innerHTML = headerHTML;
         }
 
-        // Fungsi Menangkap Perubahan Dropdown Filter Kolom
-        function updateColumnFilter(colIndex, value) {
-            const colName = roColumns[colIndex];
-            if (value === "") {
-                delete columnFilters[colName];
-            } else {
-                columnFilters[colName] = value;
+        // Toggle Popup Dropdown Menu Excel di Header
+        function toggleExcelDropdown(event, colIndex) {
+            event.stopPropagation();
+            const existingPopup = document.getElementById('excel-filter-popup');
+            
+            if (existingPopup && activeDropdownIndex === colIndex) {
+                closeAllExcelDropdowns();
+                return;
             }
-            // Jalankan filter gabungan (Global Search + Kolom)
-            filterROTable();
+            
+            closeAllExcelDropdowns();
+            activeDropdownIndex = colIndex;
+
+            const th = event.currentTarget.closest('th');
+            const rect = th.getBoundingClientRect();
+
+            const popup = document.createElement('div');
+            popup.id = 'excel-filter-popup';
+            popup.className = 'excel-dropdown-menu fixed z-50 w-64 rounded-xl p-3 shadow-2xl text-xs flex flex-col gap-2.5';
+            
+            // Posisikan tepat di bawah header
+            popup.style.top = (rect.bottom + 4) + 'px';
+            popup.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
+
+            const colName = roColumns[colIndex];
+            // Ambil semua nilai unik di kolom ini
+            let uniqueValues = [...new Set(roDataAll.map(row => row[colName]))].sort();
+
+            let checkboxesHTML = '';
+            const currentAllowed = columnCheckFilters[colIndex]; // Set atau undefined
+
+            uniqueValues.forEach((val, idx) => {
+                const valStr = val !== null && val !== undefined ? val.toString() : '';
+                const isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
+                checkboxesHTML += `
+                <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate">
+                    <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} onchange="onCheckboxChange(${colIndex})" class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                    <span class="truncate" title="${escapeHTML(valStr)}">${valStr === '' ? '(Kosong)' : escapeHTML(valStr)}</span>
+                </label>`;
+            });
+
+            popup.innerHTML = `
+                <!-- Bagian Sort -->
+                <div class="flex flex-col gap-1 pb-2 border-b excel-divider">
+                    <button onclick="applySort(${colIndex}, 'asc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-down-a-z w-4 text-center"></i> Sort A to Z / Terlama</button>
+                    <button onclick="applySort(${colIndex}, 'desc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-up-z-a w-4 text-center"></i> Sort Z to A / Terbaru</button>
+                </div>
+
+                <!-- Bagian Search dalam Filter -->
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
+                </div>
+
+                <!-- Select All / Deselect All -->
+                <div class="flex justify-between items-center px-1 text-[11px] text-gray-400">
+                    <button onclick="toggleSelectAllCheckboxes(${colIndex}, true)" class="hover:text-accent underline">Pilih Semua</button>
+                    <button onclick="toggleSelectAllCheckboxes(${colIndex}, false)" class="hover:text-accent underline">Hapus Semua</button>
+                </div>
+
+                <!-- List Checkbox Unique Values -->
+                <div id="excel-checkbox-list" class="max-h-44 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1 bg-black/20">
+                    ${checkboxesHTML}
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="flex gap-2 pt-1">
+                    <button onclick="applyExcelFilter(${colIndex})" class="flex-1 bg-accent text-dark font-bold py-1.5 rounded transition hover:opacity-90">Terapkan</button>
+                    <button onclick="clearExcelFilter(${colIndex})" class="px-3 bg-white/10 hover:bg-white/20 py-1.5 rounded transition">Reset</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
         }
 
-        // Fungsi Render untuk memuat tabel berdasarkan halaman (Pagination)
+        function closeAllExcelDropdowns() {
+            const popup = document.getElementById('excel-filter-popup');
+            if (popup) popup.remove();
+            activeDropdownIndex = null;
+        }
+
+        // Filter daftar checkbox di dalam popup saat diketik di search kecilnya
+        function filterPopupCheckboxes(keyword) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const labels = listContainer.getElementsByTagName('label');
+            const q = keyword.toLowerCase();
+            for (let lbl of labels) {
+                const text = lbl.textContent.toLowerCase();
+                if (text.includes(q)) {
+                    lbl.style.display = 'flex';
+                } else {
+                    lbl.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleSelectAllCheckboxes(colIndex, checkState) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const checkboxes = listContainer.getElementsByClassName('excel-chk');
+            for (let chk of checkboxes) {
+                if (chk.closest('label').style.display !== 'none') {
+                    chk.checked = checkState;
+                }
+            }
+        }
+
+        function onCheckboxChange(colIndex) {
+            // Bisa langsung update jika diinginkan
+        }
+
+        // Terapkan Filter Checkbox
+        function applyExcelFilter(colIndex) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const checkboxes = listContainer.getElementsByClassName('excel-chk');
+            
+            let allowedSet = new Set();
+            let totalChecked = 0;
+            let totalBoxes = 0;
+
+            for (let chk of checkboxes) {
+                totalBoxes++;
+                if (chk.checked) {
+                    allowedSet.add(chk.value);
+                    totalChecked++;
+                }
+            }
+
+            const colName = roColumns[colIndex];
+            // Jika semua dicentang, anggap tidak ada filter aktif untuk kolom ini
+            if (totalChecked === totalBoxes) {
+                delete columnCheckFilters[colIndex];
+            } else {
+                columnCheckFilters[colIndex] = allowedSet;
+            }
+
+            closeAllExcelDropdowns();
+            applyFiltersAndSort();
+            renderROHeaders();
+        }
+
+        function clearExcelFilter(colIndex) {
+            delete columnCheckFilters[colIndex];
+            closeAllExcelDropdowns();
+            applyFiltersAndSort();
+            renderROHeaders();
+        }
+
+        // Terapkan Sorting
+        function applySort(colIndex, direction) {
+            currentSort = { colIndex, direction };
+            closeAllExcelDropdowns();
+            applyFiltersAndSort();
+            renderROHeaders();
+        }
+
+        // Fungsi Utama untuk memproses Filter (Global Search + Checkbox Kolom) dan Sorting
+        function applyFiltersAndSort() {
+            const globalQuery = document.getElementById('ro-search').value.toLowerCase();
+            
+            // 1. Filtering
+            roFilteredData = roDataAll.filter(row => {
+                // Global Search
+                if (globalQuery) {
+                    const matchGlobal = Object.values(row).some(val => val.toString().toLowerCase().includes(globalQuery));
+                    if (!matchGlobal) return false;
+                }
+
+                // Checkbox Filters per Kolom
+                for (const colIdxStr in columnCheckFilters) {
+                    const idx = parseInt(colIdxStr);
+                    const colName = roColumns[idx];
+                    const allowedSet = columnCheckFilters[idx];
+                    const cellVal = row[colName] !== null && row[colName] !== undefined ? row[colName].toString() : '';
+                    
+                    if (!allowedSet.has(cellVal)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            // 2. Sorting
+            if (currentSort.colIndex !== null && currentSort.direction !== null) {
+                const colName = roColumns[currentSort.colIndex];
+                const dir = currentSort.direction;
+
+                roFilteredData.sort((a, b) => {
+                    let valA = a[colName] !== null && a[colName] !== undefined ? a[colName].toString() : '';
+                    let valB = b[colName] !== null && b[colName] !== undefined ? b[colName].toString() : '';
+
+                    // Coba bandingkan sebagai angka jika memungkinkan
+                    let numA = parseFloat(valA);
+                    let numB = parseFloat(valB);
+
+                    if (!isNaN(numA) && !isNaN(numB)) {
+                        return dir === 'asc' ? numA - numB : numB - numA;
+                    }
+
+                    // Perbandingan string biasa
+                    return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                });
+            }
+
+            currentPage = 1;
+            renderTablePage();
+        }
+
         function renderTablePage() {
             const tbody = document.getElementById('ro-tbody');
             const countEl = document.getElementById('ro-count');
@@ -738,7 +962,6 @@
             const btnPrev = document.getElementById('btn-prev');
             const btnNext = document.getElementById('btn-next');
             
-            // Logika Slice Data untuk Pagination
             const totalItems = roFilteredData.length;
             const totalPages = Math.ceil(totalItems / rowsPerPage) || 1;
             
@@ -749,7 +972,6 @@
             const endIndex = Math.min(startIndex + rowsPerPage, totalItems);
             const pageData = roFilteredData.slice(startIndex, endIndex);
 
-            // Baris Data
             if(totalItems === 0) {
                 tbody.innerHTML = `<tr><td colspan="${roColumns.length}" class="text-center py-10 text-gray-500 font-medium"><i class="fa-solid fa-magnifying-glass mb-2 text-xl"></i><br>Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
             } else {
@@ -760,7 +982,6 @@
                 }).join('');
             }
             
-            // Update Teks Informasi dan Status Tombol
             countEl.innerText = totalItems === 0 ? `Menampilkan 0 data` : `Menampilkan ${startIndex + 1}-${endIndex} dari ${totalItems.toLocaleString('id-ID')} data`;
             pageInfo.innerText = `Halaman ${currentPage} dari ${totalPages}`;
             
@@ -771,37 +992,110 @@
         function changePage(direction) {
             currentPage += direction;
             renderTablePage();
-            // Scroll otomatis ke atas tabel saat pindah halaman
             document.getElementById('ro-table-container').scrollTop = 0;
         }
 
-        // Fitur Filter Lokal Kombinasi (Global Text Search + Column Dropdown)
-        function filterROTable() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const globalQuery = document.getElementById('ro-search').value.toLowerCase();
-                
-                roFilteredData = roDataAll.filter(row => {
-                    // 1. Cek Kesesuaian dengan Global Search (Pencarian Teks)
-                    let matchesGlobal = true;
-                    if (globalQuery) {
-                        matchesGlobal = Object.values(row).some(val => val.toString().toLowerCase().includes(globalQuery));
-                    }
-                    if (!matchesGlobal) return false; // Abaikan jika teks global tidak cocok
+        // Tutup dropdown popup jika klik di luar
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('excel-filter-popup');
+            if (popup && !popup.contains(e.target)) {
+                closeAllExcelDropdowns();
+            }
+        });
 
-                    // 2. Cek Kesesuaian dengan Filter Dropdown di Kolom-kolom
-                    for (const col in columnFilters) {
-                        if (row[col] !== columnFilters[col]) {
-                            return false; // Abaikan jika salah satu dropdown tidak cocok
+        // ==========================================
+        // SMART GOOGLE-LIKE AUTOCOMPLETE SUGGESTIONS
+        // ==========================================
+        let selectedSuggestionIndex = -1;
+
+        function onGlobalSearchInput(event) {
+            const query = event.target.value.toLowerCase().trim();
+            const suggestionsBox = document.getElementById('search-suggestions');
+            
+            applyFiltersAndSort(); // Jalankan filter & sort realtime
+
+            if (!query || query.length < 2) {
+                hideSuggestions();
+                return;
+            }
+
+            let matches = new Set();
+            roDataAll.forEach(row => {
+                Object.values(row).forEach(val => {
+                    if (val !== null && val !== undefined) {
+                        let strVal = val.toString();
+                        if (strVal.toLowerCase().includes(query)) {
+                            matches.add(strVal);
                         }
                     }
-                    
-                    return true;
                 });
-                
-                currentPage = 1; // Reset kembali ke halaman pertama setiap kali difilter
-                renderTablePage();
-            }, 300); // Tunggu 300ms (Debounce) agar browser tidak hang saat mengetik cepat
+            });
+
+            let suggestions = Array.from(matches).slice(0, 8);
+
+            if (suggestions.length === 0) {
+                hideSuggestions();
+                return;
+            }
+
+            selectedSuggestionIndex = -1;
+            suggestionsBox.innerHTML = suggestions.map((sug, idx) => 
+                `<div onclick="selectSuggestion('${escapeHTML(sug).replace(/'/g, "\\'")}')" class="suggestion-item px-4 py-2 text-xs text-gray-200 hover:bg-white/10 cursor-pointer border-b border-white/5 last:border-none truncate" data-index="${idx}">
+                    <i class="fa-solid fa-magnifying-glass mr-2 text-gray-400"></i>${escapeHTML(sug)}
+                </div>`
+            ).join('');
+            
+            suggestionsBox.classList.remove('hidden');
+        }
+
+        function hideSuggestions() {
+            const suggestionsBox = document.getElementById('search-suggestions');
+            suggestionsBox.classList.add('hidden');
+            suggestionsBox.innerHTML = '';
+            selectedSuggestionIndex = -1;
+        }
+
+        function selectSuggestion(value) {
+            document.getElementById('ro-search').value = value;
+            hideSuggestions();
+            applyFiltersAndSort();
+        }
+
+        function onGlobalSearchKeydown(event) {
+            const suggestionsBox = document.getElementById('search-suggestions');
+            const items = suggestionsBox.getElementsByClassName('suggestion-item');
+            
+            if (suggestionsBox.classList.contains('hidden') || items.length === 0) return;
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedSuggestionIndex = (selectedSuggestionIndex + 1) % items.length;
+                updateActiveSuggestion(items);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedSuggestionIndex = (selectedSuggestionIndex - 1 + items.length) % items.length;
+                updateActiveSuggestion(items);
+            } else if (event.key === 'Enter') {
+                if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < items.length) {
+                    event.preventDefault();
+                    items[selectedSuggestionIndex].click();
+                } else {
+                    hideSuggestions();
+                }
+            } else if (event.key === 'Escape') {
+                hideSuggestions();
+            }
+        }
+
+        function updateActiveSuggestion(items) {
+            for (let i = 0; i < items.length; i++) {
+                if (i === selectedSuggestionIndex) {
+                    items[i].classList.add('bg-white/20', 'active-suggestion');
+                    items[i].scrollIntoView({ block: 'nearest' });
+                } else {
+                    items[i].classList.remove('bg-white/20', 'active-suggestion');
+                }
+            }
         }
         // ==========================================
 
