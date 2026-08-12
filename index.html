@@ -104,12 +104,24 @@
             color: #0f172a;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
         }
+        body.light-mode .excel-dropdown-menu input {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: rgba(0, 0, 0, 0.2) !important;
+        }
+        body.light-mode .excel-dropdown-menu input::placeholder {
+            color: #94a3b8 !important;
+        }
         body.light-mode .excel-menu-item:hover {
             background-color: #f1f5f9;
             color: #2563eb;
         }
         body.light-mode .excel-divider {
             border-color: rgba(0, 0, 0, 0.1);
+        }
+        body.light-mode .excel-chk-container {
+            background-color: #f8fafc !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
         }
         /* ------------------------------------------- */
 
@@ -626,7 +638,7 @@
         }
 
         // ==========================================
-        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE HEADER FILTER & SORT MENU
+        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE SMART FILTER & SORTING (DATE/NUMERIC AWARE)
         // ==========================================
         let roDataAll = []; 
         let roFilteredData = [];
@@ -637,10 +649,9 @@
         const rowsPerPage = 100;
         let searchTimeout = null;
         
-        // Menyimpan state filter & sorting per kolom
-        let columnCheckFilters = {}; // { colIndex: Set of allowed values } atau null jika semua dicentang
-        let currentSort = { colIndex: null, direction: null }; // direction: 'asc' or 'desc'
-        let activeDropdownIndex = null; // Indeks kolom yang sedang terbuka popupnya
+        let columnCheckFilters = {}; 
+        let currentSort = { colIndex: null, direction: null }; 
+        let activeDropdownIndex = null; 
 
         async function fetchROData(btnElement = null) {
             const statusEl = document.getElementById('ro-status');
@@ -714,7 +725,6 @@
                 .replace(/'/g, '&#039;');
         }
 
-        // Render Header dengan Tombol Dropdown Excel-like
         function renderROHeaders() {
             const thead = document.getElementById('ro-thead');
             let headerHTML = '';
@@ -747,7 +757,6 @@
             thead.innerHTML = headerHTML;
         }
 
-        // Toggle Popup Dropdown Menu Excel di Header
         function toggleExcelDropdown(event, colIndex) {
             event.stopPropagation();
             const existingPopup = document.getElementById('excel-filter-popup');
@@ -767,23 +776,21 @@
             popup.id = 'excel-filter-popup';
             popup.className = 'excel-dropdown-menu fixed z-50 w-64 rounded-xl p-3 shadow-2xl text-xs flex flex-col gap-2.5';
             
-            // Posisikan tepat di bawah header
             popup.style.top = (rect.bottom + 4) + 'px';
             popup.style.left = Math.min(rect.left, window.innerWidth - 280) + 'px';
 
             const colName = roColumns[colIndex];
-            // Ambil semua nilai unik di kolom ini
             let uniqueValues = [...new Set(roDataAll.map(row => row[colName]))].sort();
 
             let checkboxesHTML = '';
-            const currentAllowed = columnCheckFilters[colIndex]; // Set atau undefined
+            const currentAllowed = columnCheckFilters[colIndex]; 
 
-            uniqueValues.forEach((val, idx) => {
+            uniqueValues.forEach((val) => {
                 const valStr = val !== null && val !== undefined ? val.toString() : '';
                 const isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
                 checkboxesHTML += `
-                <label class="flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate">
-                    <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} onchange="onCheckboxChange(${colIndex})" class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                <label class="excel-chk-label flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
+                    <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
                     <span class="truncate" title="${escapeHTML(valStr)}">${valStr === '' ? '(Kosong)' : escapeHTML(valStr)}</span>
                 </label>`;
             });
@@ -798,17 +805,17 @@
                 <!-- Bagian Search dalam Filter -->
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
+                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai (misal: 8/11/26)..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
                 </div>
 
                 <!-- Select All / Deselect All -->
                 <div class="flex justify-between items-center px-1 text-[11px] text-gray-400">
-                    <button onclick="toggleSelectAllCheckboxes(${colIndex}, true)" class="hover:text-accent underline">Pilih Semua</button>
-                    <button onclick="toggleSelectAllCheckboxes(${colIndex}, false)" class="hover:text-accent underline">Hapus Semua</button>
+                    <button onclick="toggleSelectAllCheckboxes(true)" class="hover:text-accent underline">Pilih Semua</button>
+                    <button onclick="toggleSelectAllCheckboxes(false)" class="hover:text-accent underline">Hapus Semua</button>
                 </div>
 
                 <!-- List Checkbox Unique Values -->
-                <div id="excel-checkbox-list" class="max-h-44 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1 bg-black/20">
+                <div id="excel-checkbox-list" class="excel-chk-container max-h-44 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1 bg-black/20">
                     ${checkboxesHTML}
                 </div>
 
@@ -828,13 +835,13 @@
             activeDropdownIndex = null;
         }
 
-        // Filter daftar checkbox di dalam popup saat diketik di search kecilnya
+        // Filter popup checkbox berdasarkan ketikan pencarian di dalam pop-up
         function filterPopupCheckboxes(keyword) {
             const listContainer = document.getElementById('excel-checkbox-list');
-            const labels = listContainer.getElementsByTagName('label');
+            const labels = listContainer.getElementsByClassName('excel-chk-label');
             const q = keyword.toLowerCase();
             for (let lbl of labels) {
-                const text = lbl.textContent.toLowerCase();
+                const text = lbl.getAttribute('data-val').toLowerCase();
                 if (text.includes(q)) {
                     lbl.style.display = 'flex';
                 } else {
@@ -843,40 +850,48 @@
             }
         }
 
-        function toggleSelectAllCheckboxes(colIndex, checkState) {
+        function toggleSelectAllCheckboxes(checkState) {
             const listContainer = document.getElementById('excel-checkbox-list');
-            const checkboxes = listContainer.getElementsByClassName('excel-chk');
-            for (let chk of checkboxes) {
-                if (chk.closest('label').style.display !== 'none') {
-                    chk.checked = checkState;
+            const labels = listContainer.getElementsByClassName('excel-chk-label');
+            for (let lbl of labels) {
+                if (lbl.style.display !== 'none') {
+                    const chk = lbl.querySelector('.excel-chk');
+                    if (chk) chk.checked = checkState;
                 }
             }
         }
 
-        function onCheckboxChange(colIndex) {
-            // Bisa langsung update jika diinginkan
-        }
-
-        // Terapkan Filter Checkbox
+        // Terapkan Filter Excel: Jika sedang mengetik di pencarian pop-up, centang HANYA yang terlihat/cocok
         function applyExcelFilter(colIndex) {
             const listContainer = document.getElementById('excel-checkbox-list');
-            const checkboxes = listContainer.getElementsByClassName('excel-chk');
-            
-            let allowedSet = new Set();
-            let totalChecked = 0;
-            let totalBoxes = 0;
+            const labels = listContainer.getElementsByClassName('excel-chk-label');
+            const searchInput = document.getElementById('excel-popup-search');
+            const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
-            for (let chk of checkboxes) {
-                totalBoxes++;
-                if (chk.checked) {
-                    allowedSet.add(chk.value);
-                    totalChecked++;
+            let allowedSet = new Set();
+
+            if (searchQuery !== '') {
+                // Jika user sedang mengetik search di pop-up, otomatis pilih item yang tampak/cocok
+                for (let lbl of labels) {
+                    const val = lbl.getAttribute('data-val');
+                    if (val.toLowerCase().includes(searchQuery)) {
+                        allowedSet.add(val);
+                    }
+                }
+            } else {
+                // Jika tidak mengetik search, ikuti status checkbox manual
+                const checkboxes = listContainer.getElementsByClassName('excel-chk');
+                for (let chk of checkboxes) {
+                    if (chk.checked) {
+                        allowedSet.add(chk.value);
+                    }
                 }
             }
 
             const colName = roColumns[colIndex];
-            // Jika semua dicentang, anggap tidak ada filter aktif untuk kolom ini
-            if (totalChecked === totalBoxes) {
+            const uniqueValuesCount = new Set(roDataAll.map(row => row[colName])).size;
+
+            if (allowedSet.size === uniqueValuesCount || allowedSet.size === 0) {
                 delete columnCheckFilters[colIndex];
             } else {
                 columnCheckFilters[colIndex] = allowedSet;
@@ -894,7 +909,6 @@
             renderROHeaders();
         }
 
-        // Terapkan Sorting
         function applySort(colIndex, direction) {
             currentSort = { colIndex, direction };
             closeAllExcelDropdowns();
@@ -902,19 +916,44 @@
             renderROHeaders();
         }
 
-        // Fungsi Utama untuk memproses Filter (Global Search + Checkbox Kolom) dan Sorting
+        // Helper untuk parsing tanggal (misal format "8/11/26 12:49" atau "1/2/26 12:20") agar akurat disort
+        function parseDateOrNumber(valStr) {
+            if (!valStr) return 0;
+            // Cek apakah format tanggal m/d/yy atau m/d/yyyy
+            const parts = valStr.split(' ');
+            const datePart = parts[0];
+            const timePart = parts[1] || '00:00';
+            const dateSegments = datePart.split('/');
+            
+            if (dateSegments.length === 3) {
+                let m = parseInt(dateSegments[0], 10);
+                let d = parseInt(dateSegments[1], 10);
+                let y = parseInt(dateSegments[2], 10);
+                if (y < 100) y += 2000; // Ubah '26 jadi 2026
+
+                const timeSegments = timePart.split(':');
+                let h = parseInt(timeSegments[0], 10) || 0;
+                let min = parseInt(timeSegments[1], 10) || 0;
+
+                return new Date(y, m - 1, d, h, min).getTime();
+            }
+
+            // Jika angka biasa
+            let num = parseFloat(valStr);
+            if (!isNaN(num)) return num;
+
+            return valStr.toString().toLowerCase();
+        }
+
         function applyFiltersAndSort() {
             const globalQuery = document.getElementById('ro-search').value.toLowerCase();
             
-            // 1. Filtering
             roFilteredData = roDataAll.filter(row => {
-                // Global Search
                 if (globalQuery) {
                     const matchGlobal = Object.values(row).some(val => val.toString().toLowerCase().includes(globalQuery));
                     if (!matchGlobal) return false;
                 }
 
-                // Checkbox Filters per Kolom
                 for (const colIdxStr in columnCheckFilters) {
                     const idx = parseInt(colIdxStr);
                     const colName = roColumns[idx];
@@ -929,7 +968,6 @@
                 return true;
             });
 
-            // 2. Sorting
             if (currentSort.colIndex !== null && currentSort.direction !== null) {
                 const colName = roColumns[currentSort.colIndex];
                 const dir = currentSort.direction;
@@ -938,15 +976,13 @@
                     let valA = a[colName] !== null && a[colName] !== undefined ? a[colName].toString() : '';
                     let valB = b[colName] !== null && b[colName] !== undefined ? b[colName].toString() : '';
 
-                    // Coba bandingkan sebagai angka jika memungkinkan
-                    let numA = parseFloat(valA);
-                    let numB = parseFloat(valB);
+                    let parsedA = parseDateOrNumber(valA);
+                    let parsedB = parseDateOrNumber(valB);
 
-                    if (!isNaN(numA) && !isNaN(numB)) {
-                        return dir === 'asc' ? numA - numB : numB - numA;
+                    if (typeof parsedA === 'number' && typeof parsedB === 'number') {
+                        return dir === 'asc' ? parsedA - parsedB : parsedB - parsedA;
                     }
 
-                    // Perbandingan string biasa
                     return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
                 });
             }
@@ -995,10 +1031,9 @@
             document.getElementById('ro-table-container').scrollTop = 0;
         }
 
-        // Tutup dropdown popup jika klik di luar
         document.addEventListener('click', function(e) {
             const popup = document.getElementById('excel-filter-popup');
-            if (popup && !popup.contains(e.target)) {
+            if (popup && !popup.contains(e.target) && !e.target.closest('th')) {
                 closeAllExcelDropdowns();
             }
         });
@@ -1012,7 +1047,7 @@
             const query = event.target.value.toLowerCase().trim();
             const suggestionsBox = document.getElementById('search-suggestions');
             
-            applyFiltersAndSort(); // Jalankan filter & sort realtime
+            applyFiltersAndSort(); 
 
             if (!query || query.length < 2) {
                 hideSuggestions();
