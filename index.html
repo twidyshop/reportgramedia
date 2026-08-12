@@ -76,6 +76,15 @@
         body.light-mode #view-home .text-gray-300 { color: #d1d5db !important; }
         body.light-mode #view-home .text-gray-400 { color: #9ca3af !important; }
         body.light-mode #view-home .border-white\/20 { border-color: rgba(255,255,255,0.2) !important; }
+
+        /* RO TABLE LIGHT MODE CUSTOMIZATIONS */
+        body.light-mode #view-ro-table .bg-panel { background-color: rgba(255, 255, 255, 0.95); }
+        body.light-mode #view-ro-table input { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.1); }
+        body.light-mode #view-ro-table thead { background-color: #f8fafc; color: #0f172a; }
+        body.light-mode #view-ro-table tbody { color: #334155; }
+        body.light-mode #view-ro-table tr.hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.05) !important; }
+        body.light-mode #view-ro-table th, body.light-mode #view-ro-table td { border-color: rgba(0,0,0,0.05) !important; }
+        body.light-mode #ro-status { background-color: #ffffff; color: #64748b; }
         
         /* ------------------------------------------- */
 
@@ -164,7 +173,7 @@
         }
 
         /* Custom Scrollbars */
-        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150,150,150,0.3); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(150,150,150,0.5); }
@@ -253,7 +262,6 @@
             </div>
 
             <div class="w-full flex justify-center">
-                <!-- UPDATE IKON KE TWIDY TOOLS -->
                 <button id="left-btn-10" onclick="openMenu(10)" onmouseenter="showTooltip(this, 'TWIDY TOOLS')" onmouseleave="hideTooltip()" class="left-icon-btn w-10 h-10 md:w-11 md:h-11 flex items-center justify-center rounded-xl text-gray-400 hover:text-white hover:bg-white/10 border border-transparent">
                     <i class="fa-solid fa-screwdriver-wrench text-base md:text-lg"></i>
                 </button>
@@ -377,7 +385,7 @@
                     </div>
                 </div>
 
-                <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC (MENU 2 - 9) -->
+                <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC (UNTUK MENU IFRAME BIASA) -->
                 <div id="view-excel" class="view-layer flex flex-col bg-white">
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
                         <div class="flex items-center gap-3 min-w-0 pr-4">
@@ -410,11 +418,73 @@
                     </div>
                 </div>
 
-                <!-- LAYER 3: TWIDY TOOLS (MENU 10) -->
+                <!-- LAYER 3: REKAP RO GRAMEDIA (CUSTOM TABLE HTML/JS) -->
+                <div id="view-ro-table" class="view-layer flex flex-col bg-white">
+                    <!-- Top Actions Bar -->
+                    <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
+                        <div class="flex items-center gap-3 min-w-0 pr-4">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-[#6b2c4c]/20 flex items-center justify-center text-[#e87cb5] shrink-0">
+                                <i class="fa-solid fa-chart-column text-base md:text-lg"></i>
+                            </div>
+                            <div class="truncate">
+                                <h2 class="text-base md:text-lg font-bold text-white leading-tight truncate">Rekap RO Gramedia 2026</h2>
+                                <p class="text-[10px] md:text-xs text-textDim truncate">Custom Table Integration</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <!-- TOMBOL REFRESH -->
+                            <button onclick="fetchROData(this)" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate transition-transform duration-500"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                            <button onclick="toggleRightPanel()" class="flex px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition items-center justify-center gap-2">
+                                <i class="fa-solid fa-list-ul"></i> <span class="hidden sm:inline">Menu</span>
+                            </button>
+                            <!-- Tautan Asli Spreadsheet dipertahankan -->
+                            <a href="https://docs.google.com/spreadsheets/d/1Vw6CZKFgtv6Hwci363vGrQE5ZihybodGzqAb5tas3gY/edit" target="_blank" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Full</span>
+                            </a>
+                            <a href="https://docs.google.com/spreadsheets/d/1Vw6CZKFgtv6Hwci363vGrQE5ZihybodGzqAb5tas3gY/export?format=xlsx" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-accent hover:bg-accent/80 text-dark font-bold text-sm transition flex items-center gap-2 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
+                                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Unduh</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Area -->
+                    <div class="flex-1 w-full relative flex flex-col bg-panel">
+                        <!-- Search & Status Bar -->
+                        <div class="px-4 py-3 border-b border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0">
+                            <div class="relative w-full sm:w-80 lg:w-96">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="ro-search" oninput="filterROTable()" placeholder="Ketik untuk mencari data..." class="w-full bg-[#121214] border border-white/10 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-accent transition text-sm">
+                            </div>
+                            <div id="ro-count" class="text-xs md:text-sm text-textDim font-medium font-mono whitespace-nowrap">
+                                Menampilkan 0 dari 0 data
+                            </div>
+                        </div>
+
+                        <!-- Data Table Container -->
+                        <div class="flex-1 overflow-auto custom-scrollbar relative" id="ro-table-container">
+                            <!-- Status Loading / Error -->
+                            <div id="ro-status" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-panel z-20 transition-opacity">
+                                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-accent mb-3"></i>
+                                <span>Mengambil data dari Google Sheets...</span>
+                            </div>
+                            
+                            <table class="w-full text-left border-collapse text-sm text-gray-300" id="ro-table">
+                                <thead class="bg-[#121214] text-white sticky top-0 z-10 shadow-md">
+                                    <tr id="ro-thead"></tr>
+                                </thead>
+                                <tbody id="ro-tbody" class="divide-y divide-white/5">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LAYER 4: TWIDY TOOLS (MENU 10) -->
                 <div id="view-twidytools" class="view-layer flex flex-col bg-white">
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2">
                         <div class="flex items-center gap-3 min-w-0">
-                            <!-- Warna mengikuti palet sebelumnya -->
                             <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-[#6e2c33]/20 flex items-center justify-center text-[#e8707e] shrink-0">
                                 <i class="fa-solid fa-screwdriver-wrench text-base md:text-lg"></i>
                             </div>
@@ -503,7 +573,6 @@
 
                 <div class="h-[1px] bg-white/10 my-1 mx-2"></div>
 
-                <!-- UPDATE NAMA KE TWIDY TOOLS -->
                 <button id="right-btn-10" onclick="openMenu(10)" class="report-menu-btn w-full flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl md:rounded-2xl bg-panel/60">
                     <div class="w-10 h-10 rounded-xl bg-[#6e2c33]/80 flex items-center justify-center text-[#e8707e] shrink-0"><i class="fa-solid fa-screwdriver-wrench text-lg"></i></div>
                     <span class="text-left font-semibold text-gray-300 text-xs md:text-[13px] leading-snug whitespace-nowrap">Twidy Tools</span>
@@ -535,8 +604,9 @@
                 icon: "fa-layer-group", iconBg: "bg-[#393469]/20", iconColor: "text-[#9b94e8]" 
             },
             5: { 
+                // DIUBAH MENJADI TIPE 'ro-table'
                 title: "Rekap RO Gramedia 2026", 
-                type: 'excel', 
+                type: 'ro-table', 
                 link: "https://docs.google.com/spreadsheets/d/1Vw6CZKFgtv6Hwci363vGrQE5ZihybodGzqAb5tas3gY/edit?", 
                 icon: "fa-chart-column", iconBg: "bg-[#6b2c4c]/20", iconColor: "text-[#e87cb5]" 
             },
@@ -564,48 +634,162 @@
                 link: "https://docs.google.com/file/d/1u3wxzQrxxgCoui_NAvVATe9Oxpd-RIOW/edit?usp=drive_link&ouid=115945256919821344075&rtpof=true&sd=true", 
                 icon: "fa-money-bill-wave", iconBg: "bg-[#1d6b41]/20", iconColor: "text-[#55e896]" 
             },
-            10: { type: 'twidy' } // Update Tipe Menu 10
+            10: { type: 'twidy' }
         };
 
-        // --- GLOBAL TOOLTIP SCRIPT (Menampilkan tooltip di luar batas area potong/scroll) ---
+        // --- GLOBAL TOOLTIP SCRIPT ---
         const tooltip = document.getElementById('global-tooltip');
         function showTooltip(element, text) {
-            // Sembunyikan jika dilayar kecil (mobile)
             if (window.innerWidth < 768) return;
-            
             tooltip.innerText = text;
             const rect = element.getBoundingClientRect();
-            
-            // Kalkulasi posisi (Kanan tombol)
             tooltip.style.left = (rect.right + 12) + 'px';
             tooltip.style.top = (rect.top + (rect.height / 2) - (tooltip.offsetHeight / 2)) + 'px';
             tooltip.style.opacity = '1';
         }
-
-        function hideTooltip() {
-            tooltip.style.opacity = '0';
-        }
+        function hideTooltip() { tooltip.style.opacity = '0'; }
 
         // --- FUNGSI REFRESH IFRAME ---
         function refreshIframe(iframeId, btnElement) {
             const iframe = document.getElementById(iframeId);
             if (iframe) {
-                // Memuat ulang link yang saat ini aktif
                 const currentSrc = iframe.src;
                 iframe.src = currentSrc;
-                
-                // Tambahkan efek animasi berputar (spin) ke ikon refresh selama 1 detik
                 const icon = btnElement.querySelector('i');
                 if (icon) {
                     icon.classList.add('rotate-180');
-                    setTimeout(() => {
-                        icon.classList.remove('rotate-180');
-                    }, 500);
+                    setTimeout(() => icon.classList.remove('rotate-180'), 500);
                 }
             }
         }
 
-        // Initialize Panel state on load (Tampil jika layar PC)
+        // ==========================================
+        // LOGIKA REKAP RO GRAMEDIA (GVIZ API)
+        // ==========================================
+        let roDataAll = []; 
+        let roColumns = []; 
+        let isRoLoaded = false;
+
+        async function fetchROData(btnElement = null) {
+            const statusEl = document.getElementById('ro-status');
+            const tbody = document.getElementById('ro-tbody');
+            const thead = document.getElementById('ro-thead');
+            
+            // Animasi rotasi tombol refresh
+            if (btnElement) {
+                const icon = btnElement.querySelector('i');
+                if (icon) {
+                    icon.classList.add('rotate-180');
+                    setTimeout(() => icon.classList.remove('rotate-180'), 500);
+                }
+            }
+
+            // Tampilkan Loading
+            statusEl.style.display = 'flex';
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-3xl text-accent mb-3"></i><span class="text-sm">Mengambil data dari Google Sheets...</span>';
+            tbody.innerHTML = '';
+            thead.innerHTML = '';
+            document.getElementById('ro-search').value = ''; // Reset Pencarian
+
+            const sheetId = '1Vw6CZKFgtv6Hwci363vGrQE5ZihybodGzqAb5tas3gY';
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                // Ekstrak JSON dari respons wrapper google visualization
+                const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/);
+                
+                if (!jsonMatch) throw new Error('Format respon tidak valid.');
+                
+                const data = JSON.parse(jsonMatch[1]);
+
+                if (data.status === 'error') {
+                    throw new Error(data.errors[0].message || 'Gagal mengakses data.');
+                }
+
+                const table = data.table;
+                // Ambil daftar Kolom Header
+                roColumns = table.cols.map((c, i) => (c && c.label) ? c.label : 'Kolom ' + (i+1));
+                
+                // Ambil daftar Baris Data
+                roDataAll = table.rows.map(row => {
+                    let rowData = {};
+                    row.c.forEach((cell, i) => {
+                        if(roColumns[i]) {
+                            // Gunakan formatted value (f) jika ada, jika tidak gunakan raw value (v)
+                            const val = cell ? (cell.f !== undefined ? cell.f : (cell.v !== null ? cell.v : '')) : '';
+                            rowData[roColumns[i]] = val;
+                        }
+                    });
+                    return rowData;
+                });
+
+                isRoLoaded = true;
+                statusEl.style.display = 'none';
+                
+                // Render ke tabel
+                renderROTable(roDataAll);
+                
+            } catch (error) {
+                statusEl.innerHTML = `<div class="text-center text-red-400 bg-red-400/10 p-4 rounded-xl border border-red-400/20"><i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i><br><span class="font-bold">Gagal memuat data.</span><br><small class="text-gray-400">${error.message}</small></div>`;
+            }
+        }
+
+        // Keamanan: Mencegah XSS (karakter khusus)
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function renderROTable(dataToRender) {
+            const thead = document.getElementById('ro-thead');
+            const tbody = document.getElementById('ro-tbody');
+            const countEl = document.getElementById('ro-count');
+            
+            // Generate DOM Header
+            thead.innerHTML = roColumns.map(col => `<th class="px-4 py-3 font-semibold border-b border-white/10 whitespace-nowrap">${escapeHTML(col)}</th>`).join('');
+            
+            // Generate DOM Baris
+            if(dataToRender.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${roColumns.length}" class="text-center py-10 text-gray-500 font-medium"><i class="fa-solid fa-magnifying-glass mb-2 text-xl"></i><br>Tidak ada data yang cocok.</td></tr>`;
+            } else {
+                tbody.innerHTML = dataToRender.map(row => {
+                    return `<tr class="hover:bg-white/5 transition duration-150">` + 
+                        roColumns.map(col => `<td class="px-4 py-2.5 whitespace-nowrap border-b border-white/5">${escapeHTML(row[col])}</td>`).join('') + 
+                        `</tr>`;
+                }).join('');
+            }
+            
+            // Update Text Informasi
+            countEl.innerText = `Menampilkan ${dataToRender.length.toLocaleString('id-ID')} dari ${roDataAll.length.toLocaleString('id-ID')} data`;
+        }
+
+        // Fitur Filter Lokal (Tanpa request API ulang)
+        function filterROTable() {
+            const query = document.getElementById('ro-search').value.toLowerCase();
+            if (!query) {
+                renderROTable(roDataAll);
+                return;
+            }
+            
+            // Cari data diseluruh field (kolom)
+            const filtered = roDataAll.filter(row => {
+                return Object.values(row).some(val => 
+                    val.toString().toLowerCase().includes(query)
+                );
+            });
+            
+            renderROTable(filtered);
+        }
+        // ==========================================
+
+
         if(window.innerWidth < 1024) {
             document.getElementById('right-panel').classList.add('hidden-panel');
         } else {
@@ -672,8 +856,16 @@
             if (data.type === 'lookup') {
                 document.getElementById('view-lookup').classList.add('active');
             } else if (data.type === 'twidy') {
-                // Tampilkan Tampilan Twidy Tools
                 document.getElementById('view-twidytools').classList.add('active');
+            } else if (data.type === 'ro-table') {
+                // Tampilkan Tampilan Rekap RO Gramedia Custom Tabel
+                document.getElementById('view-ro-table').classList.add('active');
+                
+                // Hanya fetch data API jika belum dimuat sebelumnya
+                if (!isRoLoaded) {
+                    fetchROData();
+                }
+
             } else if (data.type === 'excel') {
                 document.getElementById('view-excel').classList.add('active');
                 
@@ -681,29 +873,22 @@
                 document.getElementById('excel-icon').className = "fa-solid " + data.icon + " text-base md:text-lg";
                 document.getElementById('excel-icon-box').className = "w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 " + data.iconBg + " " + data.iconColor;
                 
-                // LOGIKA BARU UNTUK GOOGLE SPREADSHEETS / GOOGLE DOCS
                 let baseLink = data.link;
                 let embedLink = baseLink;
                 let downloadLink = baseLink;
 
                 if (baseLink.includes("docs.google.com") || baseLink.includes("drive.google.com")) {
-                    // Mengubah link edit menjadi mode preview untuk ditaruh di Iframe
                     embedLink = baseLink.replace(/\/edit.*/, '/preview');
                     
-                    // Mengekstrak ID file
                     let idMatch = baseLink.match(/\/d\/([a-zA-Z0-9-_]+)/);
                     if (idMatch && idMatch[1]) {
                         if (baseLink.includes("/spreadsheets/d/")) {
-                            // 1. Jika link berupa Google Sheets asli (Native)
                             downloadLink = "https://docs.google.com/spreadsheets/d/" + idMatch[1] + "/export?format=xlsx";
                         } else {
-                            // 2. Jika link berupa File Excel biasa yang diupload ke Google Drive (/file/d/)
-                            // Endpoint ini memaksa browser langsung download tanpa trigger aplikasi Google Drive
                             downloadLink = "https://drive.google.com/uc?export=download&id=" + idMatch[1];
                         }
                     }
                 } else {
-                    // Fallback jika dikembalikan memakai link OneDrive
                     embedLink = baseLink + "&action=embedview";
                     downloadLink = baseLink + "&download=1";
                 }
@@ -718,7 +903,6 @@
         function goHome() {
             resetAllActiveStates();
             
-            // Tampilkan kembali panel kanan saat di Home (hanya di PC)
             if (window.innerWidth >= 1024) {
                 document.getElementById('right-panel').classList.remove('hidden-panel');
             } else {
