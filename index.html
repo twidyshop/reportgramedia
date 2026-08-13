@@ -30,7 +30,7 @@
     </script>
 
     <style>
-        /* TEMA DEFAULT (GELAP) */
+        /* TEMA DEFAULT (GELAP) - Sekarang jadi fallback kedua */
         body { 
             background-color: #121214; 
             color: #ffffff;
@@ -70,25 +70,50 @@
         body.light-mode .hover\:bg-white\/10:hover { background-color: rgba(0,0,0,0.05) !important; }
         body.light-mode .report-menu-btn { background: rgba(255, 255, 255, 0.6); }
 
-        /* PENGECUALIAN: Teks di atas gambar Dashboard tetap terang meski Light Mode */
+        /* PERBAIKAN SIDEBAR KIRI MODE TERANG */
+        body.light-mode aside {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border-right-color: rgba(0, 0, 0, 0.08) !important;
+        }
+        body.light-mode aside .bg-white\/10 {
+            background-color: rgba(0, 0, 0, 0.05) !important;
+        }
+        body.light-mode aside .h-\[1px\] {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+        }
+        body.light-mode #left-home.text-white {
+            color: #0f172a !important;
+        }
+        body.light-mode aside button:hover:not(.active-left):not(#left-apps) {
+            background-color: rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
+        }
+        body.light-mode #global-tooltip {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #0f172a;
+            border-color: rgba(0,0,0,0.1);
+        }
+
+        /* PENGECUALIAN: Teks di atas gambar Dashboard Home tetap terang meski Light Mode */
         body.light-mode #view-home .text-white { color: #ffffff !important; }
         body.light-mode #view-home .text-gray-200 { color: #e5e7eb !important; }
         body.light-mode #view-home .text-gray-300 { color: #d1d5db !important; }
         body.light-mode #view-home .text-gray-400 { color: #9ca3af !important; }
         body.light-mode #view-home .border-white\/20 { border-color: rgba(255,255,255,0.2) !important; }
+        body.light-mode #view-home .glass-panel { background: rgba(0, 0, 0, 0.5) !important; }
 
-        /* RO TABLE LIGHT MODE CUSTOMIZATIONS */
-        body.light-mode #view-ro-table .bg-panel { background-color: rgba(255, 255, 255, 0.95); }
-        body.light-mode #view-ro-table input { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.15); }
-        body.light-mode #view-ro-table thead { background-color: #f1f5f9; color: #0f172a; }
-        body.light-mode #view-ro-table thead th { color: #0f172a !important; }
-        body.light-mode #view-ro-table tbody { color: #334155; }
-        body.light-mode #view-ro-table tr.hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.05) !important; }
-        body.light-mode #view-ro-table th, body.light-mode #view-ro-table td { border-color: rgba(0,0,0,0.08) !important; }
-        body.light-mode #ro-status { background-color: #ffffff; color: #64748b; }
+        /* RO & ORIN TABLE LIGHT MODE CUSTOMIZATIONS */
+        body.light-mode .custom-table-view .bg-panel { background-color: rgba(255, 255, 255, 0.95); }
+        body.light-mode .custom-table-view input { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.15); }
+        body.light-mode .custom-table-view thead { background-color: #f1f5f9; color: #0f172a; }
+        body.light-mode .custom-table-view thead th { color: #0f172a !important; }
+        body.light-mode .custom-table-view tbody { color: #334155; }
+        body.light-mode .custom-table-view tr.hover\:bg-white\/5:hover { background-color: rgba(0,0,0,0.05) !important; }
+        body.light-mode .custom-table-view th, body.light-mode .custom-table-view td { border-color: rgba(0,0,0,0.08) !important; }
+        body.light-mode .status-overlay { background-color: #ffffff; color: #64748b; }
         body.light-mode .btn-pagination { background-color: #f1f5f9; color: #0f172a; border-color: rgba(0,0,0,0.1); }
         body.light-mode .btn-pagination:hover:not(:disabled) { background-color: #e2e8f0; }
-        body.light-mode #search-suggestions { background-color: #ffffff; border-color: rgba(0,0,0,0.15); color: #0f172a; }
+        body.light-mode .suggestions-box { background-color: #ffffff; border-color: rgba(0,0,0,0.15); color: #0f172a; }
         body.light-mode .suggestion-item:hover, body.light-mode .suggestion-item.active-suggestion { background-color: #f1f5f9; color: #2563eb; }
         
         /* Excel Filter Popup Menu Light/Dark */
@@ -217,7 +242,8 @@
         .custom-scrollbar-left::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="h-screen flex text-sm transition-colors">
+<!-- TAMBAH KELAS 'light-mode' DI BODY SEBAGAI DEFAULT -->
+<body class="h-screen flex text-sm transition-colors light-mode">
 
     <!-- TOOLTIP GLOBAL -->
     <div id="global-tooltip" class="fixed z-[9999] bg-panel border border-white/10 text-white px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shadow-xl opacity-0 pointer-events-none transition-opacity duration-200" style="left: 0; top: 0;"></div>
@@ -275,7 +301,8 @@
 
         <div class="pb-2 w-full flex justify-center">
             <button onclick="toggleTheme()" onmouseenter="showTooltip(this, 'Ubah Tema')" onmouseleave="hideTooltip()" class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-[14px] md:rounded-2xl text-gray-400 hover:text-accent transition">
-                <i id="theme-icon" class="fa-regular fa-sun text-xl md:text-2xl"></i>
+                <!-- ICON BULAN SEBAGAI DEFAULT UNTUK PINDAH KE MODE GELAP -->
+                <i id="theme-icon" class="fa-regular fa-moon text-xl md:text-2xl"></i>
             </button>
         </div>
     </aside>
@@ -372,7 +399,77 @@
                     </div>
                 </div>
 
-                <!-- LAYER 2: SPREADSHEETS ONLINE DYNAMIC -->
+                <!-- LAYER 2: ID ORIN GRAMEDIA X KODE BSOFT (MENU 2 - CUSTOM TABLE HTML/JS) -->
+                <div id="view-orin-table" class="view-layer custom-table-view flex flex-col bg-white">
+                    <!-- Top Actions Bar -->
+                    <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
+                        <div class="flex items-center gap-3 min-w-0 pr-4">
+                            <div class="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-[#245e69]/20 flex items-center justify-center text-[#5bc9d9] shrink-0">
+                                <i class="fa-solid fa-address-book text-base md:text-lg"></i>
+                            </div>
+                            <div class="truncate">
+                                <h2 class="text-base md:text-lg font-bold text-white leading-tight truncate">ID ORIN GRAMEDIA X KODE BSOFT</h2>
+                                <p class="text-[10px] md:text-xs text-textDim truncate">Custom Table Integration</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 shrink-0">
+                            <button onclick="fetchORINData(this)" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrows-rotate transition-transform duration-500"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                            <button onclick="toggleRightPanel()" class="flex px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition items-center justify-center gap-2">
+                                <i class="fa-solid fa-list-ul"></i> <span class="hidden sm:inline">Menu</span>
+                            </button>
+                            <a href="https://docs.google.com/spreadsheets/d/1U2jYvdm-ZYXOSh2MQe04nQJXNkfOExIiFvmh8K-hNkM/edit" target="_blank" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-medium text-sm transition flex items-center gap-2">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">Full</span>
+                            </a>
+                            <a href="https://docs.google.com/spreadsheets/d/1U2jYvdm-ZYXOSh2MQe04nQJXNkfOExIiFvmh8K-hNkM/export?format=xlsx" class="px-3 py-2 md:px-4 rounded-lg md:rounded-xl bg-accent hover:bg-accent/80 text-dark font-bold text-sm transition flex items-center gap-2 shadow-[0_0_15px_rgba(74,222,128,0.3)]">
+                                <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Unduh</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 w-full relative flex flex-col bg-panel min-h-0">
+                        <!-- Search & Status Bar dengan Smart Google-like Suggestions -->
+                        <div class="px-4 py-3 border-b border-white/10 flex flex-col sm:flex-row justify-between items-center gap-3 shrink-0 relative">
+                            <div class="relative w-full sm:w-96 lg:w-[450px]">
+                                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="orin-search" autocomplete="off" oninput="onOrinGlobalSearchInput(event)" onkeydown="onOrinGlobalSearchKeydown(event)" placeholder="Ketik kata kunci pencarian..." class="w-full bg-[#121214] border border-white/10 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-accent transition text-sm">
+                                
+                                <div id="orin-search-suggestions" class="suggestions-box absolute left-0 right-0 top-full mt-1 bg-[#1c1c1f] border border-white/20 rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
+                            </div>
+                            <div id="orin-count" class="text-xs md:text-sm text-textDim font-medium font-mono whitespace-nowrap">
+                                Menampilkan 0 dari 0 data
+                            </div>
+                        </div>
+
+                        <!-- Data Table Container -->
+                        <div class="flex-1 overflow-auto custom-scrollbar relative min-h-0" id="orin-table-container">
+                            <div id="orin-status" class="status-overlay absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-panel z-20 transition-opacity">
+                                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-accent mb-3"></i>
+                                <span>Mengambil data dari Google Sheets...</span>
+                            </div>
+                            
+                            <table class="w-full text-left border-collapse text-sm text-gray-300" id="orin-table">
+                                <thead class="bg-[#121214] text-white sticky top-0 z-30 shadow-md">
+                                    <tr id="orin-thead"></tr>
+                                </thead>
+                                <tbody id="orin-tbody" class="divide-y divide-white/5">
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination Footer -->
+                        <div class="px-4 py-2 border-t border-white/10 flex justify-between items-center bg-[#121214]/50 shrink-0">
+                            <div id="orin-page-info" class="text-xs md:text-sm text-gray-400">Halaman 1 dari 1</div>
+                            <div class="flex gap-2">
+                                <button onclick="changeOrinPage(-1)" id="btn-orin-prev" class="btn-pagination px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white text-xs transition disabled:opacity-30 disabled:cursor-not-allowed">Mundur</button>
+                                <button onclick="changeOrinPage(1)" id="btn-orin-next" class="btn-pagination px-3 py-1.5 bg-white/5 hover:bg-white/10 rounded border border-white/10 text-white text-xs transition disabled:opacity-30 disabled:cursor-not-allowed">Maju</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LAYER 3: SPREADSHEETS ONLINE DYNAMIC -->
                 <div id="view-excel" class="view-layer flex flex-col bg-white">
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
                         <div class="flex items-center gap-3 min-w-0 pr-4">
@@ -394,8 +491,8 @@
                     </div>
                 </div>
 
-                <!-- LAYER 3: REKAP RO GRAMEDIA (CUSTOM TABLE HTML/JS) -->
-                <div id="view-ro-table" class="view-layer flex flex-col bg-white">
+                <!-- LAYER 4: REKAP RO GRAMEDIA (MENU 5 - CUSTOM TABLE HTML/JS) -->
+                <div id="view-ro-table" class="view-layer custom-table-view flex flex-col bg-white">
                     <!-- Top Actions Bar -->
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2 overflow-x-auto custom-scrollbar-left">
                         <div class="flex items-center gap-3 min-w-0 pr-4">
@@ -432,7 +529,7 @@
                                 <input type="text" id="ro-search" autocomplete="off" oninput="onGlobalSearchInput(event)" onkeydown="onGlobalSearchKeydown(event)" placeholder="Ketik apa saja (misal: garda, 1/10/26)..." class="w-full bg-[#121214] border border-white/10 text-white rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-accent transition text-sm">
                                 
                                 <!-- Container Dropdown Suggestions -->
-                                <div id="search-suggestions" class="absolute left-0 right-0 top-full mt-1 bg-[#1c1c1f] border border-white/20 rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
+                                <div id="search-suggestions" class="suggestions-box absolute left-0 right-0 top-full mt-1 bg-[#1c1c1f] border border-white/20 rounded-lg shadow-2xl z-50 max-h-60 overflow-y-auto hidden custom-scrollbar"></div>
                             </div>
                             <div id="ro-count" class="text-xs md:text-sm text-textDim font-medium font-mono whitespace-nowrap">
                                 Menampilkan 0 dari 0 data
@@ -441,7 +538,7 @@
 
                         <!-- Data Table Container -->
                         <div class="flex-1 overflow-auto custom-scrollbar relative min-h-0" id="ro-table-container">
-                            <div id="ro-status" class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-panel z-20 transition-opacity">
+                            <div id="ro-status" class="status-overlay absolute inset-0 flex flex-col items-center justify-center text-gray-400 bg-panel z-20 transition-opacity">
                                 <i class="fa-solid fa-circle-notch fa-spin text-3xl text-accent mb-3"></i>
                                 <span>Mengambil data dari Google Sheets...</span>
                             </div>
@@ -466,7 +563,7 @@
                     </div>
                 </div>
 
-                <!-- LAYER 4: TWIDY TOOLS (MENU 10) -->
+                <!-- LAYER 5: TWIDY TOOLS (MENU 10) -->
                 <div id="view-twidytools" class="view-layer flex flex-col bg-white">
                     <div class="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center bg-panel border-b border-white/10 shrink-0 gap-2">
                         <div class="flex items-center gap-3 min-w-0">
@@ -562,7 +659,7 @@
             1: { type: 'lookup' }, 
             2: { 
                 title: "ID ORIN GRAMEDIA X KODE BSOFT", 
-                type: 'excel', 
+                type: 'orin-table', 
                 link: "https://docs.google.com/spreadsheets/d/1U2jYvdm-ZYXOSh2MQe04nQJXNkfOExIiFvmh8K-hNkM/edit?", 
                 icon: "fa-address-book", iconBg: "bg-[#245e69]/20", iconColor: "text-[#5bc9d9]" 
             },
@@ -637,17 +734,611 @@
             }
         }
 
+        // Helper string escape & date parser
+        function escapeHTML(str) {
+            if (str === null || str === undefined) return '';
+            return str.toString()
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function isDateColumn(colName) {
+            const lower = colName.toLowerCase();
+            return lower.includes('date') || lower.includes('time') || lower.includes('tanggal');
+        }
+
+        function parseDateObj(valStr) {
+            if (!valStr) return null;
+            const parts = valStr.toString().split(' ');
+            const datePart = parts[0];
+            const dateSegments = datePart.split('/');
+            
+            if (dateSegments.length === 3) {
+                let m = parseInt(dateSegments[0], 10);
+                let d = parseInt(dateSegments[1], 10);
+                let y = parseInt(dateSegments[2], 10);
+                if (y < 100) y += 2000;
+                
+                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                return {
+                    year: y.toString(),
+                    monthNum: m,
+                    monthName: monthNames[m - 1] || ("Bulan " + m),
+                    day: d,
+                    raw: valStr.toString()
+                };
+            }
+            return null;
+        }
+
+        function parseDateOrNumber(valStr) {
+            if (!valStr) return 0;
+            const parts = valStr.toString().split(' ');
+            const datePart = parts[0];
+            const timePart = parts[1] || '00:00';
+            const dateSegments = datePart.split('/');
+            
+            if (dateSegments.length === 3) {
+                let m = parseInt(dateSegments[0], 10);
+                let d = parseInt(dateSegments[1], 10);
+                let y = parseInt(dateSegments[2], 10);
+                if (y < 100) y += 2000;
+
+                const timeSegments = timePart.split(':');
+                let h = parseInt(timeSegments[0], 10) || 0;
+                let min = parseInt(timeSegments[1], 10) || 0;
+
+                return new Date(y, m - 1, d, h, min).getTime();
+            }
+
+            let num = parseFloat(valStr);
+            if (!isNaN(num)) return num;
+
+            return valStr.toString().toLowerCase();
+        }
+
+        function toggleSubTree(btn) {
+            const subtree = btn.closest('div').nextElementSibling;
+            const icon = btn.querySelector('i');
+            if (subtree.classList.contains('hidden')) {
+                subtree.classList.remove('hidden');
+                subtree.classList.add('flex');
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            } else {
+                subtree.classList.add('hidden');
+                subtree.classList.remove('flex');
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            }
+        }
+
+        function toggleYearGroup(chk) {
+            const groupDiv = chk.closest('div').parentElement;
+            const subBoxes = groupDiv.querySelectorAll('input[type="checkbox"]');
+            subBoxes.forEach(b => b.checked = chk.checked);
+        }
+
+        function toggleMonthGroup(chk) {
+            const groupDiv = chk.closest('div').parentElement;
+            const subBoxes = groupDiv.querySelectorAll('.excel-chk-leaf');
+            subBoxes.forEach(b => b.checked = chk.checked);
+        }
+
+        function closeAllExcelDropdowns() {
+            const popup = document.getElementById('excel-filter-popup');
+            if (popup) popup.remove();
+            activeDropdownIndex = null;
+            activeOrinDropdownIndex = null;
+        }
+
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('excel-filter-popup');
+            if (popup && !popup.contains(e.target) && !e.target.closest('th')) {
+                closeAllExcelDropdowns();
+            }
+        });
+
+
         // ==========================================
-        // LOGIKA REKAP RO GRAMEDIA: EXCEL-LIKE COLLAPSIBLE HIERARCHY DATE FILTER
+        // LOGIKA MENU 2: ID ORIN GRAMEDIA X KODE BSOFT (CUSTOM TABLE)
+        // ==========================================
+        let orinDataAll = [];
+        let orinFilteredData = [];
+        let orinColumns = [];
+        let isOrinLoaded = false;
+        let currentOrinPage = 1;
+        const orinRowsPerPage = 100;
+        let orinColumnCheckFilters = {};
+        let currentOrinSort = { colIndex: null, direction: null };
+        let activeOrinDropdownIndex = null;
+        let selectedOrinSuggestionIndex = -1;
+
+        async function fetchORINData(btnElement = null) {
+            const statusEl = document.getElementById('orin-status');
+            const tbody = document.getElementById('orin-tbody');
+            const thead = document.getElementById('orin-thead');
+            
+            if (btnElement) {
+                const icon = btnElement.querySelector('i');
+                if (icon) {
+                    icon.classList.add('rotate-180');
+                    setTimeout(() => icon.classList.remove('rotate-180'), 500);
+                }
+            }
+
+            statusEl.style.display = 'flex';
+            statusEl.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin text-3xl text-accent mb-3"></i><span class="text-sm">Mengambil data dari Google Sheets...</span>';
+            tbody.innerHTML = '';
+            thead.innerHTML = '';
+            document.getElementById('orin-search').value = ''; 
+            orinColumnCheckFilters = {};
+            currentOrinSort = { colIndex: null, direction: null };
+            closeAllExcelDropdowns();
+
+            const sheetId = '1U2jYvdm-ZYXOSh2MQe04nQJXNkfOExIiFvmh8K-hNkM';
+            const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json`;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S\w]+)\);/);
+                
+                if (!jsonMatch) throw new Error('Format respon tidak valid.');
+                
+                const data = JSON.parse(jsonMatch[1]);
+                if (data.status === 'error') throw new Error(data.errors[0].message || 'Gagal mengakses data.');
+
+                const table = data.table;
+                
+                // FILTER: Hanya ambil kolom yang benar-benar memiliki label/judul (Bukan string kosong)
+                let validColIndices = [];
+                orinColumns = [];
+                
+                table.cols.forEach((c, i) => {
+                    if (c && c.label && c.label.trim() !== '') {
+                        validColIndices.push(i);
+                        orinColumns.push(c.label.trim());
+                    }
+                });
+                
+                orinDataAll = table.rows.map(row => {
+                    let rowData = {};
+                    validColIndices.forEach((originalIndex, arrayIndex) => {
+                        const cell = row.c[originalIndex];
+                        const colLabel = orinColumns[arrayIndex];
+                        const val = cell ? (cell.f !== undefined ? cell.f : (cell.v !== null ? cell.v : '')) : '';
+                        rowData[colLabel] = val;
+                    });
+                    return rowData;
+                });
+
+                orinFilteredData = [...orinDataAll];
+                currentOrinPage = 1;
+                isOrinLoaded = true;
+                statusEl.style.display = 'none';
+                
+                renderORINHeaders();
+                renderOrinTablePage();
+                
+            } catch (error) {
+                statusEl.innerHTML = `<div class="text-center text-red-400 bg-red-400/10 p-4 rounded-xl border border-red-400/20"><i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i><br><span class="font-bold">Gagal memuat data.</span><br><small class="text-gray-400">${error.message}</small></div>`;
+            }
+        }
+
+        function renderORINHeaders() {
+            const thead = document.getElementById('orin-thead');
+            let headerHTML = '';
+            
+            orinColumns.forEach((col, i) => {
+                const isFiltered = orinColumnCheckFilters[i] !== undefined;
+                const isSorted = currentOrinSort.colIndex === i;
+                let sortIcon = '<i class="fa-solid fa-sort text-gray-400 text-xs ml-1"></i>';
+                if (isSorted) {
+                    sortIcon = currentOrinSort.direction === 'asc' 
+                        ? '<i class="fa-solid fa-sort-up text-accent text-xs ml-1"></i>' 
+                        : '<i class="fa-solid fa-sort-down text-accent text-xs ml-1"></i>';
+                }
+                const filterBadge = isFiltered ? '<span class="w-2 h-2 rounded-full bg-accent inline-block ml-1"></span>' : '';
+
+                headerHTML += `
+                <th class="px-4 py-3 font-semibold border-b border-white/10 whitespace-nowrap relative select-none bg-panel">
+                    <div class="flex items-center justify-between gap-2 cursor-pointer group" onclick="toggleOrinExcelDropdown(event, ${i})">
+                        <div class="flex items-center gap-1 truncate">
+                            <span class="text-white font-medium">${escapeHTML(col)}</span>
+                            ${filterBadge}
+                        </div>
+                        <div class="flex items-center text-gray-400 group-hover:text-white">
+                            ${sortIcon}
+                            <i class="fa-solid fa-caret-down text-xs ml-1"></i>
+                        </div>
+                    </div>
+                </th>`;
+            });
+            thead.innerHTML = headerHTML;
+        }
+
+        function toggleOrinExcelDropdown(event, colIndex) {
+            event.stopPropagation();
+            const existingPopup = document.getElementById('excel-filter-popup');
+            
+            if (existingPopup && activeOrinDropdownIndex === colIndex) {
+                closeAllExcelDropdowns();
+                return;
+            }
+            
+            closeAllExcelDropdowns();
+            activeOrinDropdownIndex = colIndex;
+
+            const th = event.currentTarget.closest('th');
+            const rect = th.getBoundingClientRect();
+            const colName = orinColumns[colIndex];
+            const isDateCol = isDateColumn(colName);
+
+            const popup = document.createElement('div');
+            popup.id = 'excel-filter-popup';
+            popup.className = 'excel-dropdown-menu fixed z-50 w-72 rounded-xl p-3 shadow-2xl text-xs flex flex-col gap-2.5';
+            
+            popup.style.top = (rect.bottom + 4) + 'px';
+            popup.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';
+
+            const currentAllowed = orinColumnCheckFilters[colIndex];
+
+            let listContentHTML = '';
+
+            if (isDateCol) {
+                let tree = {};
+                orinDataAll.forEach(row => {
+                    const val = row[colName];
+                    const dObj = parseDateObj(val);
+                    const valStr = val !== null && val !== undefined ? val.toString() : '';
+                    if (valStr === '') return;
+
+                    if (dObj) {
+                        if (!tree[dObj.year]) tree[dObj.year] = {};
+                        if (!tree[dObj.year][dObj.monthName]) tree[dObj.year][dObj.monthName] = [];
+                        if (!tree[dObj.year][dObj.monthName].includes(valStr)) {
+                            tree[dObj.year][dObj.monthName].push(valStr);
+                        }
+                    }
+                });
+
+                for (let year in tree) {
+                    let yearChecked = currentAllowed === undefined || Object.values(tree[year]).some(months => months.some(v => currentAllowed.has(v)));
+                    listContentHTML += `
+                    <div class="flex flex-col gap-1 my-1">
+                        <div class="flex items-center gap-2 font-bold px-1 text-white">
+                            <input type="checkbox" class="excel-chk-year rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5" onchange="toggleYearGroup(this)" ${yearChecked ? 'checked' : ''}>
+                            <span>${year}</span>
+                        </div>`;
+                    
+                    for (let month in tree[year]) {
+                        let monthChecked = currentAllowed === undefined || tree[year][month].some(v => currentAllowed.has(v));
+                        listContentHTML += `
+                        <div class="flex flex-col gap-0.5 ml-4 my-1">
+                            <div class="flex items-center justify-between px-1 text-gray-300 font-semibold hover:bg-white/5 rounded py-0.5">
+                                <label class="flex items-center gap-2 cursor-pointer truncate">
+                                    <input type="checkbox" class="excel-chk-month rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5" onchange="toggleMonthGroup(this)" ${monthChecked ? 'checked' : ''}>
+                                    <span>${month}</span>
+                                </label>
+                                <button type="button" onclick="toggleSubTree(this)" class="text-gray-400 hover:text-white px-1.5 py-0.5"><i class="fa-solid fa-plus text-[10px]"></i></button>
+                            </div>
+                            <div class="tree-subtree hidden flex-col gap-0.5 ml-5 mt-1 border-l border-white/10 pl-2">`;
+                        
+                        tree[year][month].forEach(valStr => {
+                            let isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
+                            listContentHTML += `
+                            <label class="excel-chk-label flex items-center gap-2 px-2 py-1 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
+                                <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk-leaf excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                                <span class="truncate text-gray-400" title="${escapeHTML(valStr)}">${escapeHTML(valStr)}</span>
+                            </label>`;
+                        });
+                        listContentHTML += `</div></div>`;
+                    }
+                    listContentHTML += `</div>`;
+                }
+            } else {
+                let uniqueValues = [...new Set(orinDataAll.map(row => row[colName]))].sort();
+                uniqueValues.forEach((val) => {
+                    const valStr = val !== null && val !== undefined ? val.toString() : '';
+                    const isChecked = currentAllowed === undefined || currentAllowed.has(valStr);
+                    listContentHTML += `
+                    <label class="excel-chk-label flex items-center gap-2 px-2 py-1.5 hover:bg-white/10 rounded cursor-pointer truncate" data-val="${escapeHTML(valStr)}">
+                        <input type="checkbox" value="${escapeHTML(valStr)}" ${isChecked ? 'checked' : ''} class="excel-chk rounded bg-[#121214] border-white/20 text-accent focus:ring-0 w-3.5 h-3.5 shrink-0">
+                        <span class="truncate" title="${escapeHTML(valStr)}">${valStr === '' ? '(Kosong)' : escapeHTML(valStr)}</span>
+                    </label>`;
+                });
+            }
+
+            popup.innerHTML = `
+                <div class="flex flex-col gap-1 pb-2 border-b excel-divider">
+                    <button onclick="applyOrinSort(${colIndex}, 'asc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-down-a-z w-4 text-center"></i> Sort A to Z / Terlama</button>
+                    <button onclick="applyOrinSort(${colIndex}, 'desc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-up-z-a w-4 text-center"></i> Sort Z to A / Terbaru</button>
+                </div>
+
+                <div class="relative">
+                    <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                    <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
+                </div>
+
+                <div class="flex justify-between items-center px-1 text-[11px] text-gray-400">
+                    <button onclick="toggleSelectAllCheckboxes(true)" class="hover:text-accent underline">Pilih Semua</button>
+                    <button onclick="toggleSelectAllCheckboxes(false)" class="hover:text-accent underline">Hapus Semua</button>
+                </div>
+
+                <div id="excel-checkbox-list" class="excel-chk-container max-h-52 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1.5 bg-black/20">
+                    ${listContentHTML}
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button onclick="applyOrinExcelFilter(${colIndex})" class="flex-1 bg-accent text-dark font-bold py-1.5 rounded transition hover:opacity-90">Terapkan</button>
+                    <button onclick="clearOrinExcelFilter(${colIndex})" class="px-3 bg-white/10 hover:bg-white/20 py-1.5 rounded transition">Reset</button>
+                </div>
+            `;
+
+            document.body.appendChild(popup);
+        }
+
+        function filterPopupCheckboxes(keyword) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const labels = listContainer.getElementsByClassName('excel-chk-label');
+            const q = keyword.toLowerCase();
+            for (let lbl of labels) {
+                const text = lbl.getAttribute('data-val').toLowerCase();
+                if (text.includes(q)) {
+                    lbl.style.display = 'flex';
+                    let subtree = lbl.closest('.tree-subtree');
+                    if (subtree) {
+                        subtree.classList.remove('hidden');
+                        subtree.classList.add('flex');
+                        let btnIcon = subtree.previousElementSibling.querySelector('i');
+                        if (btnIcon) { btnIcon.classList.remove('fa-plus'); btnIcon.classList.add('fa-minus'); }
+                    }
+                } else {
+                    lbl.style.display = 'none';
+                }
+            }
+        }
+
+        function toggleSelectAllCheckboxes(checkState) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(chk => chk.checked = checkState);
+        }
+
+        function applyOrinExcelFilter(colIndex) {
+            const listContainer = document.getElementById('excel-checkbox-list');
+            const checkboxes = listContainer.getElementsByClassName('excel-chk');
+            
+            let allowedSet = new Set();
+            let totalChecked = 0;
+            let totalBoxes = 0;
+
+            for (let chk of checkboxes) {
+                totalBoxes++;
+                if (chk.checked) {
+                    allowedSet.add(chk.value);
+                    totalChecked++;
+                }
+            }
+
+            const colName = orinColumns[colIndex];
+            const uniqueValuesCount = new Set(orinDataAll.map(row => row[colName])).size;
+
+            if (totalChecked === totalBoxes || totalChecked === 0) {
+                delete orinColumnCheckFilters[colIndex];
+            } else {
+                orinColumnCheckFilters[colIndex] = allowedSet;
+            }
+
+            closeAllExcelDropdowns();
+            applyOrinFiltersAndSort();
+            renderORINHeaders();
+        }
+
+        function clearOrinExcelFilter(colIndex) {
+            delete orinColumnCheckFilters[colIndex];
+            closeAllExcelDropdowns();
+            applyOrinFiltersAndSort();
+            renderORINHeaders();
+        }
+
+        function applyOrinSort(colIndex, direction) {
+            currentOrinSort = { colIndex, direction };
+            closeAllExcelDropdowns();
+            applyOrinFiltersAndSort();
+            renderORINHeaders();
+        }
+
+        function applyOrinFiltersAndSort() {
+            const globalQuery = document.getElementById('orin-search').value.toLowerCase();
+            
+            orinFilteredData = orinDataAll.filter(row => {
+                if (globalQuery) {
+                    const matchGlobal = Object.values(row).some(val => val.toString().toLowerCase().includes(globalQuery));
+                    if (!matchGlobal) return false;
+                }
+
+                for (const colIdxStr in orinColumnCheckFilters) {
+                    const idx = parseInt(colIdxStr);
+                    const colName = orinColumns[idx];
+                    const allowedSet = orinColumnCheckFilters[idx];
+                    const cellVal = row[colName] !== null && row[colName] !== undefined ? row[colName].toString() : '';
+                    
+                    if (!allowedSet.has(cellVal)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            if (currentOrinSort.colIndex !== null && currentOrinSort.direction !== null) {
+                const colName = orinColumns[currentOrinSort.colIndex];
+                const dir = currentOrinSort.direction;
+
+                orinFilteredData.sort((a, b) => {
+                    let valA = a[colName] !== null && a[colName] !== undefined ? a[colName].toString() : '';
+                    let valB = b[colName] !== null && b[colName] !== undefined ? b[colName].toString() : '';
+
+                    let parsedA = parseDateOrNumber(valA);
+                    let parsedB = parseDateOrNumber(valB);
+
+                    if (typeof parsedA === 'number' && typeof parsedB === 'number') {
+                        return dir === 'asc' ? parsedA - parsedB : parsedB - parsedA;
+                    }
+
+                    return dir === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                });
+            }
+
+            currentOrinPage = 1;
+            renderOrinTablePage();
+        }
+
+        function renderOrinTablePage() {
+            const tbody = document.getElementById('orin-tbody');
+            const countEl = document.getElementById('orin-count');
+            const pageInfo = document.getElementById('orin-page-info');
+            const btnPrev = document.getElementById('btn-orin-prev');
+            const btnNext = document.getElementById('btn-orin-next');
+            
+            const totalItems = orinFilteredData.length;
+            const totalPages = Math.ceil(totalItems / orinRowsPerPage) || 1;
+            
+            if (currentOrinPage > totalPages) currentOrinPage = totalPages;
+            if (currentOrinPage < 1) currentOrinPage = 1;
+
+            const startIndex = (currentOrinPage - 1) * orinRowsPerPage;
+            const endIndex = Math.min(startIndex + orinRowsPerPage, totalItems);
+            const pageData = orinFilteredData.slice(startIndex, endIndex);
+
+            if(totalItems === 0) {
+                tbody.innerHTML = `<tr><td colspan="${orinColumns.length}" class="text-center py-10 text-gray-500 font-medium"><i class="fa-solid fa-magnifying-glass mb-2 text-xl"></i><br>Tidak ada data yang cocok dengan kriteria filter.</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(row => {
+                    return `<tr class="hover:bg-white/5 transition duration-150">` + 
+                        orinColumns.map(col => `<td class="px-4 py-2.5 whitespace-nowrap border-b border-white/5">${escapeHTML(row[col])}</td>`).join('') + 
+                        `</tr>`;
+                }).join('');
+            }
+            
+            countEl.innerText = totalItems === 0 ? `Menampilkan 0 data` : `Menampilkan ${startIndex + 1}-${endIndex} dari ${totalItems.toLocaleString('id-ID')} data`;
+            pageInfo.innerText = `Halaman ${currentOrinPage} dari ${totalPages}`;
+            
+            btnPrev.disabled = currentOrinPage === 1;
+            btnNext.disabled = currentOrinPage === totalPages;
+        }
+
+        function changeOrinPage(direction) {
+            currentOrinPage += direction;
+            renderOrinTablePage();
+            document.getElementById('orin-table-container').scrollTop = 0;
+        }
+
+        function onOrinGlobalSearchInput(event) {
+            const query = event.target.value.toLowerCase().trim();
+            const suggestionsBox = document.getElementById('orin-search-suggestions');
+            
+            applyOrinFiltersAndSort(); 
+
+            if (!query || query.length < 2) {
+                hideOrinSuggestions();
+                return;
+            }
+
+            let matches = new Set();
+            orinDataAll.forEach(row => {
+                Object.values(row).forEach(val => {
+                    if (val !== null && val !== undefined) {
+                        let strVal = val.toString();
+                        if (strVal.toLowerCase().includes(query)) {
+                            matches.add(strVal);
+                        }
+                    }
+                });
+            });
+
+            let suggestions = Array.from(matches).slice(0, 8);
+
+            if (suggestions.length === 0) {
+                hideOrinSuggestions();
+                return;
+            }
+
+            selectedOrinSuggestionIndex = -1;
+            suggestionsBox.innerHTML = suggestions.map((sug, idx) => 
+                `<div onclick="selectOrinSuggestion('${escapeHTML(sug).replace(/'/g, "\\'")}')" class="suggestion-item px-4 py-2 text-xs text-gray-200 hover:bg-white/10 cursor-pointer border-b border-white/5 last:border-none truncate" data-index="${idx}">
+                    <i class="fa-solid fa-magnifying-glass mr-2 text-gray-400"></i>${escapeHTML(sug)}
+                </div>`
+            ).join('');
+            
+            suggestionsBox.classList.remove('hidden');
+        }
+
+        function hideOrinSuggestions() {
+            const suggestionsBox = document.getElementById('orin-search-suggestions');
+            suggestionsBox.classList.add('hidden');
+            suggestionsBox.innerHTML = '';
+            selectedOrinSuggestionIndex = -1;
+        }
+
+        function selectOrinSuggestion(value) {
+            document.getElementById('orin-search').value = value;
+            hideOrinSuggestions();
+            applyOrinFiltersAndSort();
+        }
+
+        function onOrinGlobalSearchKeydown(event) {
+            const suggestionsBox = document.getElementById('orin-search-suggestions');
+            const items = suggestionsBox.getElementsByClassName('suggestion-item');
+            
+            if (suggestionsBox.classList.contains('hidden') || items.length === 0) return;
+
+            if (event.key === 'ArrowDown') {
+                event.preventDefault();
+                selectedOrinSuggestionIndex = (selectedOrinSuggestionIndex + 1) % items.length;
+                updateActiveOrinSuggestion(items);
+            } else if (event.key === 'ArrowUp') {
+                event.preventDefault();
+                selectedOrinSuggestionIndex = (selectedOrinSuggestionIndex - 1 + items.length) % items.length;
+                updateActiveOrinSuggestion(items);
+            } else if (event.key === 'Enter') {
+                if (selectedOrinSuggestionIndex >= 0 && selectedOrinSuggestionIndex < items.length) {
+                    event.preventDefault();
+                    items[selectedOrinSuggestionIndex].click();
+                } else {
+                    hideOrinSuggestions();
+                }
+            } else if (event.key === 'Escape') {
+                hideOrinSuggestions();
+            }
+        }
+
+        function updateActiveOrinSuggestion(items) {
+            for (let i = 0; i < items.length; i++) {
+                if (i === selectedOrinSuggestionIndex) {
+                    items[i].classList.add('bg-white/20', 'active-suggestion');
+                    items[i].scrollIntoView({ block: 'nearest' });
+                } else {
+                    items[i].classList.remove('bg-white/20', 'active-suggestion');
+                }
+            }
+        }
+
+
+        // ==========================================
+        // LOGIKA MENU 5: REKAP RO GRAMEDIA 2026 (CUSTOM TABLE)
         // ==========================================
         let roDataAll = []; 
         let roFilteredData = [];
         let roColumns = []; 
         let isRoLoaded = false;
-        
         let currentPage = 1;
         const rowsPerPage = 100;
-        
         let columnCheckFilters = {}; 
         let currentSort = { colIndex: null, direction: null }; 
         let activeDropdownIndex = null; 
@@ -759,16 +1450,6 @@
             }
         }
 
-        function escapeHTML(str) {
-            if (str === null || str === undefined) return '';
-            return str.toString()
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
         function renderROHeaders() {
             const thead = document.getElementById('ro-thead');
             let headerHTML = '';
@@ -799,35 +1480,6 @@
                 </th>`;
             });
             thead.innerHTML = headerHTML;
-        }
-
-        function isDateColumn(colName) {
-            const lower = colName.toLowerCase();
-            return lower.includes('date') || lower.includes('time');
-        }
-
-        function parseDateObj(valStr) {
-            if (!valStr) return null;
-            const parts = valStr.toString().split(' ');
-            const datePart = parts[0];
-            const dateSegments = datePart.split('/');
-            
-            if (dateSegments.length === 3) {
-                let m = parseInt(dateSegments[0], 10);
-                let d = parseInt(dateSegments[1], 10);
-                let y = parseInt(dateSegments[2], 10);
-                if (y < 100) y += 2000;
-                
-                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-                return {
-                    year: y.toString(),
-                    monthNum: m,
-                    monthName: monthNames[m - 1] || ("Bulan " + m),
-                    day: d,
-                    raw: valStr.toString()
-                };
-            }
-            return null;
         }
 
         function toggleExcelDropdown(event, colIndex) {
@@ -923,30 +1575,25 @@
             }
 
             popup.innerHTML = `
-                <!-- Bagian Sort -->
                 <div class="flex flex-col gap-1 pb-2 border-b excel-divider">
                     <button onclick="applySort(${colIndex}, 'asc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-down-a-z w-4 text-center"></i> Sort A to Z / Terlama</button>
                     <button onclick="applySort(${colIndex}, 'desc')" class="excel-menu-item flex items-center gap-2 px-2 py-1.5 rounded text-left transition"><i class="fa-solid fa-arrow-up-z-a w-4 text-center"></i> Sort Z to A / Terbaru</button>
                 </div>
 
-                <!-- Bagian Search dalam Filter -->
                 <div class="relative">
                     <i class="fa-solid fa-search absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                     <input type="text" id="excel-popup-search" oninput="filterPopupCheckboxes(this.value)" placeholder="Cari nilai..." class="w-full bg-[#121214] border border-white/20 rounded pl-7 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-accent">
                 </div>
 
-                <!-- Select All / Deselect All -->
                 <div class="flex justify-between items-center px-1 text-[11px] text-gray-400">
                     <button onclick="toggleSelectAllCheckboxes(true)" class="hover:text-accent underline">Pilih Semua</button>
                     <button onclick="toggleSelectAllCheckboxes(false)" class="hover:text-accent underline">Hapus Semua</button>
                 </div>
 
-                <!-- List Checkbox Unique Values / Tree -->
                 <div id="excel-checkbox-list" class="excel-chk-container max-h-52 overflow-y-auto custom-scrollbar flex flex-col gap-0.5 border border-white/10 rounded p-1.5 bg-black/20">
                     ${listContentHTML}
                 </div>
 
-                <!-- Tombol Aksi -->
                 <div class="flex gap-2 pt-1">
                     <button onclick="applyExcelFilter(${colIndex})" class="flex-1 bg-accent text-dark font-bold py-1.5 rounded transition hover:opacity-90">Terapkan</button>
                     <button onclick="clearExcelFilter(${colIndex})" class="px-3 bg-white/10 hover:bg-white/20 py-1.5 rounded transition">Reset</button>
@@ -954,69 +1601,6 @@
             `;
 
             document.body.appendChild(popup);
-        }
-
-        // Fungsi Collapse / Expand (Minimize / Maximize bulan)
-        function toggleSubTree(btn) {
-            const subtree = btn.closest('div').nextElementSibling;
-            const icon = btn.querySelector('i');
-            if (subtree.classList.contains('hidden')) {
-                subtree.classList.remove('hidden');
-                subtree.classList.add('flex');
-                icon.classList.remove('fa-plus');
-                icon.classList.add('fa-minus');
-            } else {
-                subtree.classList.add('hidden');
-                subtree.classList.remove('flex');
-                icon.classList.remove('fa-minus');
-                icon.classList.add('fa-plus');
-            }
-        }
-
-        function toggleYearGroup(chk) {
-            const groupDiv = chk.closest('div').parentElement;
-            const subBoxes = groupDiv.querySelectorAll('input[type="checkbox"]');
-            subBoxes.forEach(b => b.checked = chk.checked);
-        }
-
-        function toggleMonthGroup(chk) {
-            const groupDiv = chk.closest('div').parentElement;
-            const subBoxes = groupDiv.querySelectorAll('.excel-chk-leaf');
-            subBoxes.forEach(b => b.checked = chk.checked);
-        }
-
-        function closeAllExcelDropdowns() {
-            const popup = document.getElementById('excel-filter-popup');
-            if (popup) popup.remove();
-            activeDropdownIndex = null;
-        }
-
-        function filterPopupCheckboxes(keyword) {
-            const listContainer = document.getElementById('excel-checkbox-list');
-            const labels = listContainer.getElementsByClassName('excel-chk-label');
-            const q = keyword.toLowerCase();
-            for (let lbl of labels) {
-                const text = lbl.getAttribute('data-val').toLowerCase();
-                if (text.includes(q)) {
-                    lbl.style.display = 'flex';
-                    // Otomatis buka foldernya jika ada yang cocok dengan pencarian
-                    let subtree = lbl.closest('.tree-subtree');
-                    if (subtree) {
-                        subtree.classList.remove('hidden');
-                        subtree.classList.add('flex');
-                        let btnIcon = subtree.previousElementSibling.querySelector('i');
-                        if (btnIcon) { btnIcon.classList.remove('fa-plus'); btnIcon.classList.add('fa-minus'); }
-                    }
-                } else {
-                    lbl.style.display = 'none';
-                }
-            }
-        }
-
-        function toggleSelectAllCheckboxes(checkState) {
-            const listContainer = document.getElementById('excel-checkbox-list');
-            const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(chk => chk.checked = checkState);
         }
 
         function applyExcelFilter(colIndex) {
@@ -1061,32 +1645,6 @@
             closeAllExcelDropdowns();
             applyFiltersAndSort();
             renderROHeaders();
-        }
-
-        function parseDateOrNumber(valStr) {
-            if (!valStr) return 0;
-            const parts = valStr.toString().split(' ');
-            const datePart = parts[0];
-            const timePart = parts[1] || '00:00';
-            const dateSegments = datePart.split('/');
-            
-            if (dateSegments.length === 3) {
-                let m = parseInt(dateSegments[0], 10);
-                let d = parseInt(dateSegments[1], 10);
-                let y = parseInt(dateSegments[2], 10);
-                if (y < 100) y += 2000;
-
-                const timeSegments = timePart.split(':');
-                let h = parseInt(timeSegments[0], 10) || 0;
-                let min = parseInt(timeSegments[1], 10) || 0;
-
-                return new Date(y, m - 1, d, h, min).getTime();
-            }
-
-            let num = parseFloat(valStr);
-            if (!isNaN(num)) return num;
-
-            return valStr.toString().toLowerCase();
         }
 
         function applyFiltersAndSort() {
@@ -1175,16 +1733,6 @@
             document.getElementById('ro-table-container').scrollTop = 0;
         }
 
-        document.addEventListener('click', function(e) {
-            const popup = document.getElementById('excel-filter-popup');
-            if (popup && !popup.contains(e.target) && !e.target.closest('th')) {
-                closeAllExcelDropdowns();
-            }
-        });
-
-        // ==========================================
-        // SMART GOOGLE-LIKE AUTOCOMPLETE SUGGESTIONS
-        // ==========================================
         let selectedSuggestionIndex = -1;
 
         function onGlobalSearchInput(event) {
@@ -1276,9 +1824,11 @@
                 }
             }
         }
+
+
         // ==========================================
-
-
+        // SYSTEM INIT & NAVIGATION
+        // ==========================================
         if(window.innerWidth < 1024) {
             document.getElementById('right-panel').classList.add('hidden-panel');
         } else {
@@ -1292,7 +1842,9 @@
         }
         setInterval(updateDateTime, 1000); updateDateTime();
 
-        let isDarkMode = true;
+        // Variabel tema SEKARANG di-set False (karena Light Mode adalah default)
+        let isDarkMode = false;
+        
         function toggleTheme() {
             const body = document.body;
             const themeIcon = document.getElementById('theme-icon');
@@ -1300,10 +1852,12 @@
             isDarkMode = !isDarkMode;
             
             if (isDarkMode) {
+                // Hapus mode terang, ganti ikon ke Matahari (Sun) untuk opsi balik
                 body.classList.remove('light-mode');
                 themeIcon.classList.remove('fa-moon');
                 themeIcon.classList.add('fa-sun');
             } else {
+                // Balik ke mode terang, ganti ikon ke Bulan (Moon)
                 body.classList.add('light-mode');
                 themeIcon.classList.remove('fa-sun');
                 themeIcon.classList.add('fa-moon');
@@ -1342,6 +1896,11 @@
                 document.getElementById('view-lookup').classList.add('active');
             } else if (data.type === 'twidy') {
                 document.getElementById('view-twidytools').classList.add('active');
+            } else if (data.type === 'orin-table') {
+                document.getElementById('view-orin-table').classList.add('active');
+                if (!isOrinLoaded) {
+                    fetchORINData();
+                }
             } else if (data.type === 'ro-table') {
                 document.getElementById('view-ro-table').classList.add('active');
                 if (!isRoLoaded) {
