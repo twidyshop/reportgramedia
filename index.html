@@ -894,23 +894,34 @@
 
                 const table = data.table;
                 
-                // FILTER: Hanya ambil kolom yang benar-benar memiliki label/judul (Bukan string kosong)
+                // Ambil semua kolom berjudul, dan pastikan kolom I (Rack) selalu ikut.
+                // Google Visualization memakai indeks 0-based: kolom I = indeks 8.
+                const rackColumnIndex = 8;
                 let validColIndices = [];
                 orinColumns = [];
-                
+
                 table.cols.forEach((c, i) => {
-                    if (c && c.label && c.label.trim() !== '') {
+                    const label = c && c.label ? c.label.trim() : '';
+                    if (label !== '' || i === rackColumnIndex) {
                         validColIndices.push(i);
-                        orinColumns.push(c.label.trim());
+                        orinColumns.push(label || (i === rackColumnIndex ? 'Rack' : `Kolom ${i + 1}`));
                     }
                 });
-                
+
+                // Fallback jika respons GViz tidak menyertakan metadata kolom I.
+                if (!validColIndices.includes(rackColumnIndex)) {
+                    validColIndices.push(rackColumnIndex);
+                    orinColumns.push('Rack');
+                }
+
                 orinDataAll = table.rows.map(row => {
                     let rowData = {};
                     validColIndices.forEach((originalIndex, arrayIndex) => {
-                        const cell = row.c[originalIndex];
+                        const cell = row && Array.isArray(row.c) ? row.c[originalIndex] : null;
                         const colLabel = orinColumns[arrayIndex];
-                        const val = cell ? (cell.f !== undefined ? cell.f : (cell.v !== null ? cell.v : '')) : '';
+                        const val = cell
+                            ? (cell.f !== undefined && cell.f !== null ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : ''))
+                            : '';
                         rowData[colLabel] = val;
                     });
                     return rowData;
